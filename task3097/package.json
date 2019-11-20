@@ -1,0 +1,19 @@
+{
+  "name": "task3097",
+  "version": "1.0.0",
+  "description": "форма с валидацией",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "vladvshka",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-validator": "^6.2.0"
+  }
+}
