@@ -6,7 +6,7 @@ const webserver = express();
 
 const port = 7180;
 const method = 'method=get';
-const action = `action=http://localhost:${port}/login`;
+const action = `/login`;
 
 const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
     const view = `
