@@ -1,0 +1,8 @@
+{
+    "validUsers":[
+        { 
+            "login":"admin",
+            "password":"admin"
+        }
+    ]
+}

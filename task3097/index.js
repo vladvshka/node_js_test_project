@@ -1,5 +1,6 @@
 const express = require('express');
 const { query, validationResult } = require('express-validator');
+const users = require('./users.json');
 
 const webserver = express();
 
@@ -36,6 +37,7 @@ const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
 
 const getResultsView = (username = '', password = '') => {
     const resultsView = `
+        <h3 style="box-sizing: border-box;text-align:center;">Your input:</h3>
         <div class="control-group" style="box-sizing:border-box;margin-bottom:10px;">
         <input type="text" class="login-field" value="${username}" id="login-name" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-user" for="login-name" style="box-sizing: border-box;"></label>
         </div>
@@ -51,7 +53,7 @@ const getLoginForm = (withErrors = false) => {
     let errorMsg = '';
 
     if (withErrors) {
-        errorMsg = '<span class="login-link" text-align="center" style="box-sizing:border-box;font-size:12px;color:#ea1515;display:block;margin-top:12px;">Please, validate your creds</span>';
+        errorMsg = '<span class="login-link" text-align="center" style="box-sizing:border-box;text-align:center;font-size:12px;color:#ea1515;display:block;margin-top:12px;">Please, validate your creds</span>';
     }
 
     const formView = `
@@ -71,6 +73,9 @@ const getLoginForm = (withErrors = false) => {
     return getViewPage({ formView, errorMsg });
 }
 
+const validateCreds = ({ username, password }) => 
+    !!users.validUsers.find(creds => creds.login === username && creds.password === password);
+
 
 webserver.get('/login', [
     query('username').exists().isLength({ min: 3 }),
@@ -83,7 +88,11 @@ webserver.get('/login', [
     } else if (Object.keys(req.query).length === 0) {
         res.send(getLoginForm());
     } else {
-        res.send(getResultsView(req.query.username, req.query.password));
+        if (validateCreds(req.query)) {
+            res.send(getResultsView(req.query.username, req.query.password));
+        } else {
+            res.send(getLoginForm(true));
+        }
     }
 });
 
