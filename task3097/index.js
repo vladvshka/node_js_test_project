@@ -66,7 +66,7 @@ const getLoginForm = (withErrors = false) => {
             <input type="password" class="login-field" name="password" placeholder="password" id="login-pass" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-lock" for="login-pass" style="box-sizing: border-box;"></label>
             </div>
 
-            <input type="submit" class="btn btn-primary btn-large btn-block" href="#" style="box-sizing:border-box;border:2px solid transparent;background:#3498DB;color:#ffffff;font-size:16px;line-height:25px;padding:10px 0;text-decoration:none;text-shadow:none;border-radius:3px;box-shadow:none;transition:0.25s;display:block;width:250px;margin:0 auto;"/>
+            <input type="submit" class="btn btn-primary btn-large btn-block" style="box-sizing:border-box;border:2px solid transparent;background:#3498DB;color:#ffffff;font-size:16px;line-height:25px;padding:10px 0;text-decoration:none;text-shadow:none;border-radius:3px;box-shadow:none;transition:0.25s;display:block;width:250px;margin:0 auto;"/>
             <a class="login-link" href="#" style="box-sizing:border-box;font-size:12px;color:#444;display:block;margin-top:12px;">Lost your password?</a>
         </form>`;
 
