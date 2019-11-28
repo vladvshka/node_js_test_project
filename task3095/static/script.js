@@ -7,7 +7,6 @@
     }
     
     const setUpStatistics = (statistics) => {
-        console.log('statistics', statistics);
         const statisticsWrapper = document.getElementById('statisticsWrapper');
         statisticsWrapper.style.display = 'block';
 
