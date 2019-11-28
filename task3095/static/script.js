@@ -21,8 +21,8 @@
             newElement.setAttribute('class', 'statElement');
 
             newElement.innerHTML = `
-                <span>${option.label}</span>
-                <span>${option.number}</span>
+                <span class='stat'>${option.label}: </span>
+                <span class='num'>${option.number}</span>
             `;
 
             const statisticsHeader = document.getElementById('statisticsHeader');
@@ -58,30 +58,36 @@
     };
 
     const setUpVariants = (variants) => {
-        const fieldsetNode = document.getElementsByTagName('fieldset')[0];
+        const fieldsetNode = document.getElementsByTagName('ul')[0];
 
         for (const key in variants) {
             const text = variants[key];
+            const liNode = document.createElement('li');
             const inputNode = document.createElement('input');
+            const labelNode = document.createElement('label');
+            const divNode = document.createElement('div');
 
             inputNode.setAttribute('type', 'radio');
             inputNode.setAttribute('name', 'group');
             inputNode.setAttribute('id', `${key}`);
             inputNode.setAttribute('value', `${key}`);
-
-            const labelNode = document.createElement('label');
             labelNode.setAttribute('for', `${key}`);
+            divNode.setAttribute('class', 'check');
+
             labelNode.innerText = text;
 
-            fieldsetNode.appendChild(inputNode);
-            fieldsetNode.appendChild(labelNode);
+            liNode.appendChild(inputNode);
+            liNode.appendChild(labelNode);
+            liNode.appendChild(labelNode);
+
+            fieldsetNode.appendChild(liNode);
         }
     };
 
     try {
         const variantsResponse = await fetch('/variants');
 
-        if (variantsResponse.ok) {        
+        if (variantsResponse.ok) {
             const variants = await variantsResponse.json();
             setUpVariants(variants);
         }
