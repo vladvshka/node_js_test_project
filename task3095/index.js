@@ -49,15 +49,20 @@ const updateStatistics = (value) => {
     return newStatistics;
 };
 
-// multered req
-webServer.post('/vote', upload.none(), (req, res) => {
-    // console.log('req.body', req.body);
-    const votedOption = req.body.group;
-    const newStatistics = updateStatistics(votedOption);
-    console.log(newStatistics);
+webServer.get('/stat', (req, res) => {
+    const data = fs.readFileSync(path.join(__dirname, statisticsFileName), 'utf8');
+    const statistics = JSON.parse(data);
 
     res.setHeader(contentTypeHeader, 'application/json');
-    res.send(newStatistics);
+    res.send(statistics);
+});
+
+// multered req
+webServer.post('/vote', upload.none(), (req, res) => {
+    const votedOption = req.body.group;
+    updateStatistics(votedOption);
+
+    res.sendStatus(200);
 });
 
 webServer.get('/variants', (req, res) => {

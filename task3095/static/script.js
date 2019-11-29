@@ -37,20 +37,25 @@
 
         const formData = new FormData(form);
         
-        if (!formData.has("group")) {
+        if (!formData.has('group')) {
             return;
         }
 
         try {
-            const statisticsResponse = await fetch('/vote', {
+            const voteResponse = await fetch('/vote', {
                 method: 'POST',
                 body: formData,
             });
     
-            if (statisticsResponse.ok) {        
-                const statistics = await statisticsResponse.json();
-                setUpStatistics(statistics);
-            }
+            if (voteResponse.ok) {        
+                const statisticsResponse = await fetch('/stat');
+        
+                if (statisticsResponse.ok) {        
+                    const statistics = await statisticsResponse.json();
+                    setUpStatistics(statistics);
+                };
+            };
+
         } catch (error) {
             console.error('error', error);
         }
