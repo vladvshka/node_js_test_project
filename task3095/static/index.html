@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>Vote, please</h2>
+        <h3>Vote, please</h3>
         <form action="/vote" method="post" id="form" enctype="multipart/form-data">
             <ul></ul>
             <input class="button" type="submit" />
@@ -17,6 +17,24 @@
         <div id="statisticsWrapper" style="display: none;">
             <h3 id="statisticsHeader">Statistics: </h3>
         </div>
+        <div id="downloadsWrapper" style="display: none;">
+            <h3>Downnload statistics: </h3>
+            <div>
+                <form method="GET" action="/download">
+                    <input type="hidden" name="format" value="JSON">
+                    <input type="submit" class="button" value="JSON">
+                </form>
+                <form action="/download">
+                    <input type="hidden" name="format" value="HTML">
+                    <input type="submit" class="button" value="HTML">
+                </form>
+                <form action="/download">
+                    <input type="hidden" name="format" value="XML">
+                    <input type="submit" class="button" value="XML">
+                </form>
+            </div>
+        </div>
+
         <script src="./script.js"></script>
     </div>
 </body>

@@ -29,6 +29,11 @@
             statisticsHeader.parentNode.insertBefore(newElement, statisticsHeader.nextSibling);
         }
     };
+
+    const setupDownloadButtons = () => {
+        const downloadsWrapper = document.getElementById('downloadsWrapper');
+        downloadsWrapper.style.display = 'block';
+    }
     
     const handleVoteClick = async (e) => {
         e.preventDefault();
@@ -53,6 +58,7 @@
                 if (statisticsResponse.ok) {        
                     const statistics = await statisticsResponse.json();
                     setUpStatistics(statistics);
+                    setupDownloadButtons();
                 };
             };
 
