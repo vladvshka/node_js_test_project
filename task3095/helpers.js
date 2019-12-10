@@ -1,41 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const variantsJson = require('./static/variants.json');
+const variantsObject = require('./static/variants.json');
 
 const statisticsFileName = 'statistics.json';
-
-// reads statisticsFile and update it, or creates it with default fields.
-const updateStatistics = (value) => {
-    let newStatistics = {};
-
-    try {
-        const data = fs.readFileSync(path.join(__dirname, statisticsFileName), 'utf8');
-
-        const statistics = JSON.parse(data);
-        
-        newStatistics = {
-            ...statistics,
-            [value]: {
-                number: statistics[value] ? statistics[value].number + 1 : 1,
-                label: variantsJson[value],
-            },
-        };
-    } catch (error) {
-        for (const option in variantsJson) {
-            if (variantsJson.hasOwnProperty(option)) {
-                newStatistics[option] = {
-                    number: option === value ? 1 : 0,
-                    label: variantsJson[option],
-                };
-            }
-        }
-    }
-
-    fs.writeFileSync(statisticsFileName, JSON.stringify(newStatistics));
-
-    return newStatistics;
-};
 
 const getHTMLstat = (statObject) => {
     const htmlStart = '<!DOCTYPE html><html><body>';
@@ -65,6 +33,59 @@ const getXMLstat = (statObject) => {
     return xmlStart + xmlBody + xmlEnd;    
 };
 
+// Initialize stat file.
+const initStatistics = () => {
+    const options = Object.keys(variantsObject);
+
+    if (options.length > 0) {
+        const newStatistics = options.reduce((accum, option) => ({
+            ...accum,
+            [option]: {
+                number: 0,
+                label: variantsObject[option],
+            },
+        }), {});
+    
+        fs.writeFileSync(statisticsFileName, JSON.stringify(newStatistics));
+
+        return newStatistics;
+    };
+
+    return null;
+};
+
+// reads statisticsFile and update it, or creates it with default fields.
+const updateStatistics = (value) => {
+    let newStatistics = {};
+    
+    try {
+        const data = fs.readFileSync(path.join(__dirname, statisticsFileName), 'utf8');
+
+        const statistics = JSON.parse(data);
+        
+        newStatistics = {
+            ...statistics,
+            [value]: {
+                number: statistics[value] ? statistics[value].number + 1 : 1,
+                label: variantsObject[value],
+            },
+        };
+    } catch (error) {
+        for (const option in variantsObject) {
+            if (variantsObject.hasOwnProperty(option)) {
+                newStatistics[option] = {
+                    number: option === value ? 1 : 0,
+                    label: variantsObject[option],
+                };
+            }
+        }
+    }
+
+    fs.writeFileSync(statisticsFileName, JSON.stringify(newStatistics));
+
+    return newStatistics;
+};
+
 const getStatFileByFormat = (format) => {
     const statJson = fs.readFileSync(path.join(__dirname, statisticsFileName), 'utf8');
     const statObject = JSON.parse(statJson);
@@ -91,6 +112,7 @@ const getStatFileByFormat = (format) => {
 };
 
 module.exports = {
+    initStatistics,
     updateStatistics,
     getStatFileByFormat,
 };

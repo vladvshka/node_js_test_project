@@ -1,4 +1,5 @@
 (async() => {
+    // Removes nodes with current statistics
     const unsetCurrentNodes = () => {
         const statElements = document.getElementsByClassName('statElement');
         while(statElements.length > 0){
@@ -6,7 +7,8 @@
         }
     }
     
-    const setUpStatistics = (statistics) => {
+    // Renders statistics from an object.
+    const renderStatistics = (statistics) => {
         const statisticsWrapper = document.getElementById('statisticsWrapper');
         statisticsWrapper.style.display = 'block';
 
@@ -30,11 +32,13 @@
         }
     };
 
-    const setupDownloadButtons = () => {
+    // Shows download buttons.
+    const showDownloadButtons = () => {
         const downloadsWrapper = document.getElementById('downloadsWrapper');
         downloadsWrapper.style.display = 'block';
     }
     
+    // Processes vote button click
     const handleVoteClick = async (e) => {
         e.preventDefault();
 
@@ -53,13 +57,7 @@
             });
     
             if (voteResponse.ok) {        
-                const statisticsResponse = await fetch('/stat');
-        
-                if (statisticsResponse.ok) {        
-                    const statistics = await statisticsResponse.json();
-                    setUpStatistics(statistics);
-                    setupDownloadButtons();
-                };
+                await updateStatistics();
             };
 
         } catch (error) {
@@ -67,7 +65,8 @@
         }
     };
 
-    const setUpVariants = (variants) => {
+    // Renders all options.
+    const renderVariants = (variants) => {
         const fieldsetNode = document.getElementsByTagName('ul')[0];
 
         for (const key in variants) {
@@ -94,12 +93,27 @@
         }
     };
 
+    // Download stat -> Render stat.
+    const updateStatistics = async () => {
+        const statisticsResponse = await fetch('/stat');
+        
+        if (statisticsResponse.ok) {        
+            const statistics = await statisticsResponse.json();
+            renderStatistics(statistics);
+        };
+    };
+
+    // Entry point.
     try {
         const variantsResponse = await fetch('/variants');
 
         if (variantsResponse.ok) {
             const variants = await variantsResponse.json();
-            setUpVariants(variants);
+            renderVariants(variants);
+
+            await updateStatistics();
+
+            showDownloadButtons();
         }
 
         document.getElementById('form').addEventListener('submit', handleVoteClick);

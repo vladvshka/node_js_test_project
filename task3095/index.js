@@ -5,17 +5,18 @@ const multer  = require('multer');
 const fs = require('fs');
 const etag = require('etag');
 
-const variantsJson = require('./static/variants.json');
-const { updateStatistics, getStatFileByFormat } = require('./helpers.js');
+// custom modules
+const variantsObject = require('./static/variants.json');
+const { updateStatistics, getStatFileByFormat, initStatistics } = require('./helpers.js');
 
 const webServer = express();
 const upload = multer();
 
-const port = 7180;
-
+// middlewares
 webServer.use(bodyParser.urlencoded({ extended: false }));
 webServer.use(express.static(path.join(__dirname, 'static')));
 
+const port = 7180;
 const indexPage = path.join(__dirname, 'static', 'index.html');
 const statisticsFileName = 'statistics.json';
 const headers = {
@@ -37,13 +38,23 @@ const downloadFormats = {
 };
 
 webServer.get('/stat', (req, res) => {
-    const data = fs.readFileSync(path.join(__dirname, statisticsFileName), 'utf8');
-    const eTag = etag(data);
+    fs.readFile(path.join(__dirname, statisticsFileName), 'utf8', (err, data) => {
+        let statistics = null;
 
-    res.setHeader(headers.cacheControl, 'public, max-age=0');
-    res.setHeader(headers.eTag, eTag);
-    res.setHeader(headers.contentTypeHeader, 'application/json');
-    res.send(data);
+        if (err) {
+            statistics = initStatistics();
+        } else {
+            statistics = data;
+        }
+
+        const eTag = etag(statistics);
+
+        // Should we comapre If-None-Match manually? Express does smth by itself.
+        res.setHeader(headers.cacheControl, 'public, max-age=0');
+        res.setHeader(headers.eTag, eTag);
+        res.setHeader(headers.contentTypeHeader, 'application/json');
+        res.send(statistics);
+    });
 });
 
 webServer.get('/download', (req, res) => {
@@ -61,7 +72,7 @@ webServer.get('/download', (req, res) => {
     }
 });
 
-// multered req
+// req is sent as a Form.
 webServer.post('/vote', upload.none(), (req, res) => {
     const votedOption = req.body.group;
     updateStatistics(votedOption);
@@ -70,8 +81,13 @@ webServer.post('/vote', upload.none(), (req, res) => {
 });
 
 webServer.get('/variants', (req, res) => {
+    const eTag = etag(JSON.stringify(variantsObject));
+
+    res.setHeader(headers.cacheControl, 'public, max-age=0');
+    res.setHeader(headers.eTag, eTag);
     res.setHeader(headers.contentTypeHeader, 'application/json');
-    res.send(variantsJson);
+    // object will be reverted to JSON.
+    res.send(variantsObject);
 });
 
 webServer.get('/mainpage', (req, res) => {
