@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
 const querystring = require('querystring');
 
-// const users = require('./users.json');
+const users = require('./users.json');
 
 const webserver = express();
 
@@ -42,7 +42,7 @@ const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
 
 const getResultsView = (username = '', password = '') => {
     const resultsView = `
-        <h3 style="box-sizing: border-box;text-align:center;">Your input:</h3>
+        <h3 style="box-sizing: border-box;text-align:center;">Welcome:</h3>
         <div class="control-group" style="box-sizing:border-box;margin-bottom:10px;">
         <input type="text" class="login-field" value="${username}" id="login-name" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-user" for="login-name" style="box-sizing: border-box;"></label>
         </div>
@@ -78,8 +78,8 @@ const getLoginForm = (withErrors = false) => {
     return getViewPage({ formView, errorMsg });
 }
 
-// const validateCreds = ({ username, password }) => 
-//     !!users.validUsers.find(creds => creds.login === username && creds.password === password);
+const areValidCreds = ({ username, password }) => 
+    !!users.validUsers.find(creds => creds.login === username && creds.password === password);
 
 webserver.get('/login', (req, res) => {
     res.send(getLoginForm());
@@ -101,9 +101,14 @@ webserver.post('/login', [
         res.send(getLoginForm(true));
     } else {
         const { username, password } = req.body;
-        const query = querystring.stringify({ username, password });
 
-        res.redirect(301, `/welcome?${query}`);
+        if (areValidCreds(req.body)) {
+            const query = querystring.stringify({ username, password });
+
+            res.redirect(301, `/welcome?${query}`);
+        } else {
+            res.redirect(301, '/login');
+        }
     }
 });
 
