@@ -16,7 +16,7 @@ const upload = multer();
 webServer.use(bodyParser.urlencoded({ extended: false }));
 webServer.use(express.static(path.join(__dirname, 'static')));
 
-const port = 7180;
+const port = 7181;
 const indexPage = path.join(__dirname, 'static', 'index.html');
 const statisticsFileName = 'statistics.json';
 const headers = {

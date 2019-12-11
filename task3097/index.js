@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const bodyParser = require('body-parser');
 const querystring = require('querystring');
 
-const users = require('./users.json');
+// const users = require('./users.json');
 
 const webserver = express();
 
