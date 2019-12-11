@@ -1,11 +1,16 @@
 const express = require('express');
-const { query, validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
+const bodyParser = require('body-parser');
+const querystring = require('querystring');
+
 const users = require('./users.json');
 
 const webserver = express();
 
+webserver.use(bodyParser.urlencoded({ extended: false }));
+
 const port = 7180;
-const method = 'method=get';
+const method = 'post';
 const action = `/login`;
 
 const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
@@ -57,7 +62,7 @@ const getLoginForm = (withErrors = false) => {
     }
 
     const formView = `
-        <form ${method} ${action} class="login-form" style="box-sizing:border-box;text-align:center;">
+        <form method="${method}" ${action} class="login-form" style="box-sizing:border-box;text-align:center;">
             <div class="control-group" style="box-sizing:border-box;margin-bottom:10px;">
             <input type="text" class="login-field" name="username" placeholder="username" id="login-name" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-user" for="login-name" style="box-sizing: border-box;"></label>
             </div>
@@ -73,27 +78,33 @@ const getLoginForm = (withErrors = false) => {
     return getViewPage({ formView, errorMsg });
 }
 
-const validateCreds = ({ username, password }) => 
-    !!users.validUsers.find(creds => creds.login === username && creds.password === password);
+// const validateCreds = ({ username, password }) => 
+//     !!users.validUsers.find(creds => creds.login === username && creds.password === password);
 
+webserver.get('/login', (req, res) => {
+    res.send(getLoginForm());
+});
 
-webserver.get('/login', [
-    query('username').exists().isLength({ min: 3 }),
-    query('password').exists().isLength({ min: 3 }),
+webserver.get('/welcome', (req, res) => {
+    const { username, password } = req.query;
+    res.send(getResultsView(username, password));
+});
+
+webserver.post('/login', [
+    body('username').exists().isLength({ min: 3 }),
+    body('password').exists().isLength({ min: 3 }),
 ], (req, res) => {
     const errors = validationResult(req);
+    const bodyParams = Object.keys(req.body);
 
-    if (Object.keys(req.query).length > 0 && !errors.isEmpty()) {
+    if (bodyParams.length > 0 && !errors.isEmpty()) {
         res.send(getLoginForm(true));
-    } else if (Object.keys(req.query).length === 0) {
-        res.send(getLoginForm());
     } else {
-        if (validateCreds(req.query)) {
-            res.send(getResultsView(req.query.username, req.query.password));
-        } else {
-            res.send(getLoginForm(true));
-        }
+        const { username, password } = req.body;
+        const query = querystring.stringify({ username, password });
+
+        res.redirect(301, `/welcome?${query}`);
     }
 });
 
-webserver.listen(port);
+webserver.listen(port, () => {console.log(`Validation server is listening on ${port} port`)});
