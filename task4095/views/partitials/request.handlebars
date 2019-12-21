@@ -1,0 +1,80 @@
+<div>
+    {{!-- Request --}}
+    <form action="/" method="POST" enctype="multipart/form-data" id="requestForm">
+        <div>
+            {{!-- method, url --}}
+            <h4>Request details</h4>
+            <div>
+                {{!-- method --}}
+                <select name="method" required>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                </select>
+                {{!-- url --}}
+                <label for="urlField">URL: </label>
+                <input type="text" name="url" id="urlField" required>
+            </div>
+
+            {{!-- params --}}
+            <h4>Query parameters</h4>
+            <div>
+                {{!-- headings --}}
+                <div>
+                    <span>Key</span>
+                    <span> Value</span>
+                </div>
+                {{!-- key-value --}}
+                <div id="paramGroup">
+                    <div>
+                        <input type="text" name="paramKey1" id="paramKey1">
+                        <input type="text" name="paramValue1" id="paramValue1">
+                    </div>
+                </div>
+
+                <button type="button" id="addParam">Add</button>
+            </div>
+
+            {{!-- headers --}}
+            <h4>Query parameters</h4>
+            <div>
+                {{!-- headings --}}
+                <div>
+                    <span>Header</span>
+                    <span> Value</span>
+                </div>
+                {{!-- key-value --}}
+                <div id="headerGroup">
+                    <div>
+                        <input type="text" name="headerKey1" id="headerKey1">
+                        <input type="text" name="headerValue1" id="headerValue1">
+                    </div>
+                </div>
+
+                <button type="button" id="addHeader">Add</button>
+            </div>
+
+            {{!-- content-type --}}
+            <h4>Content-type</h4>
+            <div>
+                <select name="content-type">
+                    <option value="application/json">application/json</option>
+                    <option value="application/xml">application/xml</option>
+                    <option value="text/html">text/html</option>
+                </select>
+            </div>
+
+            {{!-- body --}}
+            <h4>Request body</h4>
+            <div>
+                <textarea name="body" id="body" cols="60" rows="30"></textarea>
+            </div>
+        </div>
+    </form>
+
+    <button form="requestForm" type="submit">Make a request</button>
+
+    {{!-- Response --}}
+    <div>
+
+    </div>
+</div>
