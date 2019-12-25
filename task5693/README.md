@@ -1,3 +1,4 @@
 To run with test data:
--node index.js
--answer `test`
+
+1. node index.js
+2. answer `test`
