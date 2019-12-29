@@ -1,8 +1,8 @@
 const express = require("express");
 const path = require("path");
-const exphbs = require("express-handlebars");
 const multer = require("multer");
 const fetch = require("isomorphic-fetch");
+const pug = require("pug");
 
 const { getFullUrl, makeRequest, getOptions } = require("./utils");
 
@@ -10,11 +10,9 @@ const webServer = express();
 const upload = multer();
 
 const port = 7180;
-// const hbs = exphbs.create();
 
 // view engine setup
-webServer.engine("handlebars", exphbs()); // регистрируем движок шаблонов handlebars в списке движков шаблонов express
-webServer.set("view engine", "handlebars"); // устанавливаем, что будет использоваться именно движок шаблонов handlebars
+webServer.set("view engine", "pug"); // устанавливаем, что будет использоваться именно движок шаблонов pug
 webServer.set("views", path.join(__dirname, "views")); // задаём папку, в которой будут шаблоны
 
 // middlewares
@@ -37,7 +35,7 @@ webServer.use((err, req, res, next) => {
 	res.sendStatus(err.status || 500);
 });
 
-webServer.get("/", (req, res) => res.render("main_page"));
+webServer.get("/", (req, res) => res.render("main"));
 
 webServer.post("/", upload.none(), async (req, res) => {
 	console.log("body: ", req.body);
@@ -46,11 +44,13 @@ webServer.post("/", upload.none(), async (req, res) => {
 	const fullUrl = getFullUrl(req.body);
 	const options = getOptions(req.body);
 
-	const result = await makeRequest(fullUrl, options);
+	// const result = await makeRequest(fullUrl, options);
 
-	res.status(200);
+	// console.log("result", result);
+
+	res.render("main", { shouldShowResponse: true });
+
+	// res.sendStatus(200);
 });
 
-webServer.listen(port, () =>
-	console.log(`Postman WS listening on port ${port}!`)
-);
+webServer.listen(port, () => console.log(`Postman listening on port ${port}!`));

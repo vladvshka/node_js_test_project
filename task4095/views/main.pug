@@ -1,0 +1,63 @@
+doctype html
+head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='Content-Type' content='text/html; charset=UTF-8')
+    link(rel='stylesheet' href='style.css' type='text/css')
+    title Postman
+div
+    // Request
+    form#requestForm(action='/' method='POST' enctype='multipart/form-data')
+        div
+            // method, url
+            h4 Request details
+            div
+                // method
+                select(name='method' required='')
+                    option(value='GET') GET
+                    option(value='POST') POST
+                // url
+                label(for='urlField') URL: 
+                input#urlField(type='text' name='url' required='')
+            // params
+            h4 Query parameters
+            div
+                // headings
+                div
+                    span Key
+                    span  Value
+                // key-value
+                #paramGroup
+                    div
+                        input#paramKey1(type='text' name='paramKey1' value='test')
+                        input#paramValue1(type='text' name='paramValue1' value='1')
+                button#addParam(type='button') Add
+            // headers
+            h4 Query parameters
+            div
+                // headings
+                div
+                    span Header
+                    span  Value
+                // key-value
+                #headerGroup
+                    div
+                        input#headerKey1(type='text' name='headerKey1')
+                        input#headerValue1(type='text' name='headerValue1')
+                button#addHeader(type='button') Add
+            // content-type
+            h4 Content-type
+            div
+                select(name='content-type')
+                    option(value='application/json') application/json
+                    option(value='application/xml') application/xml
+                    option(value='text/html') text/html
+            // body
+            h4 Request body
+            div
+                textarea#body(name='body' cols='60' rows='30')
+    button(form='requestForm' type='submit') Make a request
+    // Response
+    if shouldShowResponse
+        include response.pug
+script(src='index.js')
