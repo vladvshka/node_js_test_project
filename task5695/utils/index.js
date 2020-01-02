@@ -18,7 +18,9 @@ class TaskQueue extends EventEmitter {
 	}
 
 	runNextTask() {
+		console.log("this.isTaskRunning", this.isTaskRunning);
 		if (!this.isTaskRunning) {
+			console.log("this.queue", this.queue);
 			if (this.queue.length > 0) {
 				const firstTask = this.queue.shift();
 				const taskPromise = firstTask();
@@ -27,13 +29,13 @@ class TaskQueue extends EventEmitter {
 				return taskPromise
 					.then(id => {
 						console.log("Task succeed");
-						this.taskRunning = false;
+						this.isTaskRunning = false;
 						this.emit("done", id);
 						this.runNextTask();
 					})
 					.catch(err => {
 						console.log("Task error: ", err);
-						this.taskRunning = false;
+						this.isTaskRunning = false;
 						this.emit("error", id);
 						this.runNextTask();
 					});
@@ -49,6 +51,7 @@ class TaskQueue extends EventEmitter {
  * 3) As it's JSON, it can't be appended
  */
 const updateStorage = (taskQueue, newFileData) => {
+	console.log("in updateStorage");
 	const task = () =>
 		new Promise((resolve, reject) => {
 			const storagePath = path.join(__dirname, "../", "public", storageName);
@@ -60,6 +63,7 @@ const updateStorage = (taskQueue, newFileData) => {
 				}
 
 				const storage = JSON.parse(data);
+				console.log("storage", storage);
 				storage.uploades.push(newFileData);
 
 				fs.writeFile(storagePath, JSON.stringify(storage), err => {
@@ -73,6 +77,8 @@ const updateStorage = (taskQueue, newFileData) => {
 				});
 			});
 		});
+
+	console.log("task: ", task);
 
 	taskQueue.addTask(task);
 };
