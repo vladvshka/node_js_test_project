@@ -31,6 +31,10 @@ webserver.use(express.static(path.join(__dirname, "public")));
 
 // checkStorageConsistency();
 
+taskQueue.on("empty", () => {
+	console.log("DONE");
+});
+
 // Use progress->multer bundle to handle uploads.
 webserver.post("/upload", (req, res) => {
 	const bodyProgress = progress();
@@ -64,12 +68,19 @@ webserver.post("/upload", (req, res) => {
 
 		updateStorage(taskQueue, fileData);
 
-		taskQueue.on("done", id => {
-			if (id === fileId) {
-				console.log("Client's file is uploaded and stored.");
-				res.redirect("/");
-			}
-		});
+		taskQueue
+			.on("done", id => {
+				if (id === fileId) {
+					console.log("Client's file is uploaded and stored.");
+					res.redirect("/");
+				}
+			})
+			.on("error", id => {
+				if (id === fileId) {
+					console.log("Client's file saving error.");
+					res.redirect("/");
+				}
+			});
 	});
 });
 

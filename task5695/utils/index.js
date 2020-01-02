@@ -24,22 +24,20 @@ class TaskQueue extends EventEmitter {
 				const taskPromise = firstTask();
 				this.isTaskRunning = true;
 
-				taskPromise
-					.then(() => {
+				return taskPromise
+					.then(id => {
 						console.log("Task succeed");
 						this.taskRunning = false;
+						this.emit("done", id);
 						this.runNextTask();
 					})
 					.catch(err => {
 						console.log("Task error: ", err);
 						this.taskRunning = false;
+						this.emit("error", id);
 						this.runNextTask();
 					});
-			} else {
-				this.emit("done");
 			}
-		} else {
-			this.emit("done");
 		}
 	}
 }
