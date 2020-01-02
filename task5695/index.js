@@ -2,6 +2,7 @@ const express = require("express");
 const progress = require("progress-stream");
 const path = require("path");
 const multer = require("multer"); // для обработки тел запроса в формате multipart/form-data
+const uuidv1 = require("uuid/v1");
 const { TaskQueue, updateStorage } = require("./utils");
 
 const webserver = express();
@@ -53,22 +54,22 @@ webserver.post("/upload", (req, res) => {
 		// file contains single "attachment"
 		console.log("file", bodyProgress.file);
 
+		const fileId = uuidv1();
+
 		const fileData = {
+			fileId,
 			comment: bodyProgress.body.comment,
 			fileName: bodyProgress.file.filename,
 		};
 
 		updateStorage(taskQueue, fileData);
 
-		taskQueue
-			.on("done", () => {
-				console.log("taskQueue done");
+		taskQueue.on("done", id => {
+			if (id === fileId) {
+				console.log("Client's file is uploaded and stored.");
 				res.redirect("/");
-			})
-			.on("error", err => {
-				console.log("error", err);
-				res.redirect("/");
-			});
+			}
+		});
 	});
 });
 

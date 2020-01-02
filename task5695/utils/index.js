@@ -31,8 +31,9 @@ class TaskQueue extends EventEmitter {
 						this.runNextTask();
 					})
 					.catch(err => {
-						console.log("Task execution error", err);
-						this.emit("error", err);
+						console.log("Task error: ", err);
+						this.taskRunning = false;
+						this.runNextTask();
 					});
 			} else {
 				this.emit("done");
@@ -70,7 +71,7 @@ const updateStorage = (taskQueue, newFileData) => {
 					}
 
 					console.log("Storage has been updated!");
-					resolve();
+					resolve(newFileData.fileId);
 				});
 			});
 		});
