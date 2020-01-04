@@ -1,0 +1,20 @@
+doctype html
+head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible' content='ie=edge')
+    link(rel='stylesheet' type='text/css' href='style.css')
+    title File Uploader
+if shouldShowHistory
+    include history.pug
+form#form(action='/upload' method='post' enctype='multipart/form-data')
+    | Comment: 
+    input(type='text' name='comment')
+    br
+    input(type='file' name='attachment')
+    br
+    input(type='submit' value='Upload')
+#myProgress
+    #myBar
+        span#barLabel 0%
+script(type='module' src='./client.js')

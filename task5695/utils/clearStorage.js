@@ -13,7 +13,7 @@ fs.readFile(storagePath, (err, data) => {
 		console.log("Error reading storage", err);
 	} else {
 		const storage = JSON.parse(data);
-		storage.uploades = [];
+		storage.uploads = [];
 
 		fs.writeFile(storagePath, JSON.stringify(storage), err => {
 			if (err) {

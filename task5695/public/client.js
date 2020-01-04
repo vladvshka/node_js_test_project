@@ -1,4 +1,9 @@
-import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "../shared/index.js";
+import {
+	KEEP_ALIVE,
+	CONNECTION_ID,
+	PROGRESS,
+	CLIENT_TIMEOUT,
+} from "../shared/index.js";
 
 (async () => {
 	const updateProgressBar = progress => {
@@ -19,22 +24,17 @@ import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "../shared/index.js";
 	 * Web socket protocol supports text and binary data.
 	 * In terms of Javascript, text refers to as a string, while binary data is represented like ArrayBuffer.
 	 */
-	let connection = new WebSocket(url); // это сокет-соединение с сервером
-
-	connection.onopen = event => {
-		// connection.send("hello from client to server!"); // можно послать строку, Blob или ArrayBuffer
-	};
+	let connection = new WebSocket(url);
 
 	connection.onmessage = msg => {
 		console.log("клиентом получено сообщение от сервера: " + msg.data);
 		const data = JSON.parse(msg.data);
 
 		if (data[CONNECTION_ID]) {
+			// connectionId is needed to identify client's requests on server.
 			connectionId = data[CONNECTION_ID];
-			console.log(CONNECTION_ID, connectionId);
 		} else if (data[PROGRESS]) {
 			const progress = data[PROGRESS];
-			console.log(PROGRESS, progress);
 			updateProgressBar(progress);
 		}
 	};
@@ -49,32 +49,40 @@ import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "../shared/index.js";
 		clearInterval(keepAliveTimer);
 	};
 
-	// чтобы сервер знал, что этот клиент ещё жив, будем регулярно слать ему сообщение "я жив"
 	const keepAliveTimer = setInterval(() => {
-		connection.send(KEEP_ALIVE); // вот эту строчку бы зашарить с сервером!
-	}, 20000); // и это число!
+		connection.send(KEEP_ALIVE);
+	}, CLIENT_TIMEOUT);
 
-	const handleSubmit = async e => {
+	const handleUpload = async e => {
 		e.preventDefault();
 		e.stopPropagation();
 
 		const form = document.getElementById("form");
 
 		const formData = new FormData(form);
+
+		// File attachment is a must!
+		if (formData.get("attachment").size === 0) {
+			return;
+		}
+
 		const url = encodeURI(`/upload/?CONNECTION_ID=${connectionId}`);
 
 		try {
+			const myProgress = document.getElementById("myProgress");
+			myProgress.style.visibility = "visible";
+
 			const response = await fetch(url, {
 				method: "POST",
 				body: formData,
 			});
 
-			// Have to handle redirect manually, as default POST handler has been rewritten by handleSubmit.
+			// Have to handle redirect manually, as default POST handler has been rewritten by handleUpload.
 			window.location = response.url;
 		} catch (error) {
 			console.error("error", error);
 		}
 	};
 
-	document.getElementById("form").addEventListener("submit", handleSubmit);
+	document.getElementById("form").addEventListener("submit", handleUpload);
 })();

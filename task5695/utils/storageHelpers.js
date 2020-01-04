@@ -65,7 +65,7 @@ const updateStorage = (taskQueue, newFileData) => {
 
 				const storage = JSON.parse(data);
 				console.log("storage", storage);
-				storage.uploades.push(newFileData);
+				storage.uploads.push(newFileData);
 
 				fs.writeFile(storagePath, JSON.stringify(storage), err => {
 					if (err) {

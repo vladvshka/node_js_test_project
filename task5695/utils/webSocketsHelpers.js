@@ -1,4 +1,6 @@
-class WebSocketsWatcher {
+import { CLIENT_TIMEOUT } from "../shared/index";
+
+export class WebSocketsWatcher {
 	constructor() {
 		this.clients = [];
 		this.initWatcher();
@@ -10,7 +12,7 @@ class WebSocketsWatcher {
 				const currentClients = this.clients;
 
 				currentClients.forEach(client => {
-					if (Date.now() - client.lastkeepalive > 50000) {
+					if (Date.now() - client.lastkeepalive > CLIENT_TIMEOUT * 3) {
 						client.connection.terminate(); // если клиент уже давно не отчитывался что жив - закрываем соединение
 						client.connection = null;
 					}
@@ -43,10 +45,6 @@ class WebSocketsWatcher {
 		let result = null;
 
 		this.clients.forEach(client => {
-			console.log(client.connectionId);
-			console.log("++++++++++++++++");
-			console.log(connectionId);
-
 			if (client.connectionId === connectionId) {
 				client.lastkeepalive = Date.now();
 				result = client.connection;
@@ -56,7 +54,3 @@ class WebSocketsWatcher {
 		return result;
 	}
 }
-
-module.exports = {
-	WebSocketsWatcher,
-};

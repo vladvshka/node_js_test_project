@@ -1,0 +1,7 @@
+div
+    ul
+        each upload in uploads
+            li
+                div= upload.comment
+                div= upload.fileName
+                a(href=`/download/${upload.fileId}`) Download
