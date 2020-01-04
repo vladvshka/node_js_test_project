@@ -115,8 +115,19 @@ webserver.post("/upload", (req, res) => {
 	});
 });
 
-webserver.get("/", (req, res) => {
-	res.render("main");
+webserver.get("/", async (req, res) => {
+	const storageJson = await fsp.readFile(
+		path.join(__dirname, "public", "storage.json"),
+		"utf8"
+	);
+
+	const { uploads } = JSON.parse(storageJson);
+
+	if (uploads.length > 0) {
+		res.redirect(302, "/history");
+	} else {
+		res.render("main");
+	}
 });
 
 // With uploads history
