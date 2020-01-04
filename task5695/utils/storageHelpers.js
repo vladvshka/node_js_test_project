@@ -52,6 +52,7 @@ class TaskQueue extends EventEmitter {
  */
 const updateStorage = (taskQueue, newFileData) => {
 	console.log("in updateStorage");
+
 	const task = () =>
 		new Promise((resolve, reject) => {
 			const storagePath = path.join(__dirname, "../", "public", storageName);
