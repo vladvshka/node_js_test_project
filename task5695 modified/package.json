@@ -1,0 +1,27 @@
+{
+	"name": "task5695",
+	"version": "1.0.0",
+	"description": "File storage",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "nodemon preload.js",
+		"clear": "node ./utils/clearStorage"
+	},
+	"author": "vladvshka",
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.17.1",
+		"multer": "^1.4.2",
+		"progress-stream": "^2.0.0",
+		"pug": "^2.0.4",
+		"uuid": "^3.3.3",
+		"ws": "^7.2.1"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.7.7",
+		"@babel/preset-env": "^7.7.7",
+		"@babel/register": "^7.7.7",
+		"nodemon": "^2.0.2"
+	}
+}
