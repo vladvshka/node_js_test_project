@@ -10,6 +10,7 @@ import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "./shared/index.js";
 import { WebSocketsWatcher } from "./utils/webSocketsHelpers";
 
 const { TaskQueue, updateStorage } = require("./utils/storageHelpers");
+const { logLine } = require("./utils/helpers");
 
 const webserver = express();
 const port = 7180;
@@ -23,7 +24,7 @@ const taskQueue = new TaskQueue();
  * Every new client gets an ID. The connection is stored and handled by WebSocketsWatcher.
  */
 wsServer.on("connection", connection => {
-	console.log("new client connected");
+	logLine("new client connected");
 	const connectionId = uuidv1();
 	watcher.addClient(connection, connectionId);
 
@@ -58,8 +59,6 @@ webserver.use("/shared/", express.static(path.resolve(__dirname, "shared")));
 webserver.set("view engine", "pug"); // устанавливаем, что будет использоваться именно движок шаблонов pug
 webserver.set("views", path.join(__dirname, "views")); // задаём папку, в которой будут шаблоны
 
-// checkStorageConsistency();
-
 // Use progress->multer bundle to handle uploads.
 webserver.post("/upload", (req, res) => {
 	const bodyProgress = progress();
@@ -76,7 +75,7 @@ webserver.post("/upload", (req, res) => {
 			if (!!connection) {
 				connection.send(msg);
 			} else {
-				console.log("Error finding connection: ", connectionId);
+				logLine("Error finding connection: ", connectionId);
 			}
 		});
 	}
@@ -89,10 +88,6 @@ webserver.post("/upload", (req, res) => {
 		if (err) {
 			res.status(500);
 		}
-
-		console.log("body", bodyProgress.body);
-		// file contains single "attachment"
-		console.log("file", bodyProgress.file);
 
 		const fileId = uuidv1();
 
@@ -107,13 +102,13 @@ webserver.post("/upload", (req, res) => {
 		taskQueue
 			.on("done", id => {
 				if (id === fileId) {
-					console.log("Client's file is uploaded and stored.");
+					logLine("Client's file is uploaded and stored.");
 					res.redirect(302, "/history");
 				}
 			})
 			.on("error", id => {
 				if (id === fileId) {
-					console.log("Client's file saving error.");
+					logLine("Client's file saving error.");
 					res.redirect(302, "/history");
 				}
 			});
@@ -133,8 +128,6 @@ webserver.get("/history", async (req, res) => {
 
 	const { uploads } = JSON.parse(storageJson);
 
-	console.log("uploads", uploads);
-
 	res.render("main", { shouldShowHistory: true, uploads });
 });
 
@@ -151,7 +144,7 @@ webserver.get("/download/:downloadId", async (req, res) => {
 	const fileName = uploads.find(upload => upload.fileId === downloadId)
 		.fileName;
 
-	console.log("Client is downloading: ", fileName);
+	logLine("Client is downloading: ", fileName);
 
 	const file = path.resolve(__dirname, "uploads", fileName);
 
@@ -169,5 +162,5 @@ webserver.get("*", (req, res) => {
 });
 
 webserver.listen(port, () =>
-	console.log(`File uploader listening on port ${port}!`)
+	logLine(`File uploader listening on port ${port}!`)
 );

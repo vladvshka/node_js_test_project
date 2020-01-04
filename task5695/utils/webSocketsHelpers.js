@@ -1,3 +1,5 @@
+const { logLine } = require("./helpers");
+
 import { CLIENT_TIMEOUT } from "../shared/index";
 
 export class WebSocketsWatcher {
@@ -35,7 +37,7 @@ export class WebSocketsWatcher {
 	updateConnectionTime(connectionId) {
 		this.clients.forEach(client => {
 			if (client.connectionId === connectionId) {
-				console.log("KEEP_ALIVE from client:", client.connectionId);
+				logLine("KEEP_ALIVE from client:", client.connectionId);
 				client.lastkeepalive = Date.now();
 			}
 		});

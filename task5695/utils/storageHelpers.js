@@ -1,7 +1,7 @@
-// const storageObject = require("../public/storage.json");
 const EventEmitter = require("events");
 const path = require("path");
 const fs = require("fs");
+const { logLine } = require("./helpers");
 
 const storageName = "storage.json";
 
@@ -18,9 +18,10 @@ class TaskQueue extends EventEmitter {
 	}
 
 	runNextTask() {
-		console.log("this.isTaskRunning", this.isTaskRunning);
+		logLine("this.isTaskRunning", this.isTaskRunning);
+
 		if (!this.isTaskRunning) {
-			console.log("this.queue", this.queue);
+			logLine("this.queue", this.queue);
 			if (this.queue.length > 0) {
 				const firstTask = this.queue.shift();
 				const taskPromise = firstTask();
@@ -28,13 +29,13 @@ class TaskQueue extends EventEmitter {
 
 				return taskPromise
 					.then(id => {
-						console.log("Task succeed");
+						logLine("Task succeed");
 						this.isTaskRunning = false;
 						this.emit("done", id);
 						this.runNextTask();
 					})
 					.catch(err => {
-						console.log("Task error: ", err);
+						logLine("Task error: ", err);
 						this.isTaskRunning = false;
 						this.emit("error", id);
 						this.runNextTask();
@@ -51,7 +52,7 @@ class TaskQueue extends EventEmitter {
  * 3) As it's JSON, it can't be appended
  */
 const updateStorage = (taskQueue, newFileData) => {
-	console.log("in updateStorage");
+	logLine("in updateStorage");
 
 	const task = () =>
 		new Promise((resolve, reject) => {
@@ -59,27 +60,27 @@ const updateStorage = (taskQueue, newFileData) => {
 
 			fs.readFile(storagePath, (err, data) => {
 				if (err) {
-					console.log("Error reading storage", err);
+					logLine("Error reading storage", err);
 					reject(err);
 				}
 
 				const storage = JSON.parse(data);
-				console.log("storage", storage);
+				logLine("storage", storage);
 				storage.uploads.push(newFileData);
 
 				fs.writeFile(storagePath, JSON.stringify(storage), err => {
 					if (err) {
-						console.log("Error writing storage", err);
+						logLine("Error writing storage", err);
 						reject(err);
 					}
 
-					console.log("Storage has been updated!");
+					logLine("Storage has been updated!");
 					resolve(newFileData.fileId);
 				});
 			});
 		});
 
-	console.log("task: ", task);
+	logLine("task: ", task);
 
 	taskQueue.addTask(task);
 };
