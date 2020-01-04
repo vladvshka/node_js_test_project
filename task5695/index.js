@@ -5,7 +5,7 @@ const multer = require("multer"); // для обработки тел запро
 const uuidv1 = require("uuid/v1");
 const WebSocket = require("ws");
 
-import { KEEP_ALIVE } from "./shared/index.js";
+import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "./shared/index.js";
 
 const { TaskQueue, updateStorage } = require("./utils/storageHelpers");
 const { WebSocketsWatcher } = require("./utils/webSocketsHelpers");
@@ -21,7 +21,7 @@ wsServer.on("connection", connection => {
 	const connectionId = uuidv1();
 	watcher.addClient(connection, connectionId);
 
-	connection.send(JSON.stringify({ CONNECTION_ID: connectionId }));
+	connection.send(JSON.stringify({ [CONNECTION_ID]: connectionId }));
 
 	connection.on("message", message => {
 		if (message === KEEP_ALIVE) {
@@ -59,21 +59,18 @@ webserver.post("/upload", (req, res) => {
 	const bodyProgress = progress();
 	const fileLength = +req.headers["content-length"]; // берём длину всего тела запроса
 
-	const CONNECTION_ID = req.query.CONNECTION_ID;
+	const connectionId = req.query[CONNECTION_ID];
 
-	if (CONNECTION_ID) {
+	if (connectionId) {
 		bodyProgress.on("progress", info => {
-			console.log("loaded " + info.transferred + " bytes of " + fileLength);
-			console.log("Percent: " + info.transferred / fileLength);
-			console.log("========================");
-			const msg = JSON.stringify({ PROGRESS: info.transferred / fileLength });
+			const msg = JSON.stringify({ [PROGRESS]: info.transferred / fileLength });
 
-			const connection = watcher.getConnectionById(CONNECTION_ID);
+			const connection = watcher.getConnectionById(connectionId);
 
 			if (!!connection) {
 				connection.send(msg);
 			} else {
-				console.log("Error finding connection: ", CONNECTION_ID);
+				console.log("Error finding connection: ", connectionId);
 			}
 		});
 	}
@@ -105,16 +102,21 @@ webserver.post("/upload", (req, res) => {
 			.on("done", id => {
 				if (id === fileId) {
 					console.log("Client's file is uploaded and stored.");
-					res.redirect("/");
+					res.redirect(302, "/main");
 				}
 			})
 			.on("error", id => {
 				if (id === fileId) {
 					console.log("Client's file saving error.");
-					res.redirect("/");
+					res.redirect(302, "/main");
 				}
 			});
 	});
+});
+
+webserver.get("/main", (req, res) => {
+	res.setHeader("Content-Type", "text/html");
+	res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 webserver.listen(port, () =>

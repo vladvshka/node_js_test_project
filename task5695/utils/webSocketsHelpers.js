@@ -10,7 +10,7 @@ class WebSocketsWatcher {
 				const currentClients = this.clients;
 
 				currentClients.forEach(client => {
-					if (Date.now() - client.lastkeepalive > 12000) {
+					if (Date.now() - client.lastkeepalive > 50000) {
 						client.connection.terminate(); // если клиент уже давно не отчитывался что жив - закрываем соединение
 						client.connection = null;
 					}

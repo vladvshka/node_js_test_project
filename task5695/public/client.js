@@ -1,9 +1,20 @@
-import { KEEP_ALIVE } from "../shared/index.js";
+import { KEEP_ALIVE, CONNECTION_ID, PROGRESS } from "../shared/index.js";
 
 (async () => {
-	let CONNECTION_ID = null;
+	const updateProgressBar = progress => {
+		const myBar = document.getElementById("myBar");
+		let width = Math.round(progress * 100);
 
-	const url = "ws://localhost:7181/";
+		if (width <= 100) {
+			myBar.style.width = width + "%";
+
+			document.getElementById("barLabel").innerHTML = width + "%";
+		}
+	};
+
+	let connectionId = null;
+
+	const url = `ws://${window.location.hostname}:7181/`;
 	/**
 	 * Web socket protocol supports text and binary data.
 	 * In terms of Javascript, text refers to as a string, while binary data is represented like ArrayBuffer.
@@ -18,12 +29,13 @@ import { KEEP_ALIVE } from "../shared/index.js";
 		console.log("клиентом получено сообщение от сервера: " + msg.data);
 		const data = JSON.parse(msg.data);
 
-		if (data.CONNECTION_ID) {
-			CONNECTION_ID = data.CONNECTION_ID;
-			console.log("CONNECTION_ID", CONNECTION_ID);
-		} else if (data.PROGRESS) {
-			PROGRESS = data.PROGRESS;
-			console.log("PROGRESS", PROGRESS);
+		if (data[CONNECTION_ID]) {
+			connectionId = data[CONNECTION_ID];
+			console.log(CONNECTION_ID, connectionId);
+		} else if (data[PROGRESS]) {
+			const progress = data[PROGRESS];
+			console.log(PROGRESS, progress);
+			updateProgressBar(progress);
 		}
 	};
 
@@ -31,8 +43,8 @@ import { KEEP_ALIVE } from "../shared/index.js";
 		console.log("WebSocket error:", error);
 	};
 
-	connection.onclose = () => {
-		console.log("соединение с сервером закрыто");
+	connection.onclose = event => {
+		console.log("соединение с сервером закрыто: ", event.code);
 		connection = null;
 		clearInterval(keepAliveTimer);
 	};
@@ -40,7 +52,7 @@ import { KEEP_ALIVE } from "../shared/index.js";
 	// чтобы сервер знал, что этот клиент ещё жив, будем регулярно слать ему сообщение "я жив"
 	const keepAliveTimer = setInterval(() => {
 		connection.send(KEEP_ALIVE); // вот эту строчку бы зашарить с сервером!
-	}, 5000); // и это число!
+	}, 20000); // и это число!
 
 	const handleSubmit = async e => {
 		e.preventDefault();
@@ -49,13 +61,16 @@ import { KEEP_ALIVE } from "../shared/index.js";
 		const form = document.getElementById("form");
 
 		const formData = new FormData(form);
-		const url = encodeURI(`/upload/?CONNECTION_ID=${CONNECTION_ID}`);
+		const url = encodeURI(`/upload/?CONNECTION_ID=${connectionId}`);
 
 		try {
-			await fetch(url, {
+			const response = await fetch(url, {
 				method: "POST",
 				body: formData,
 			});
+
+			// Have to handle redirect manually, as default POST handler has been rewritten by handleSubmit.
+			window.location = response.url;
 		} catch (error) {
 			console.error("error", error);
 		}

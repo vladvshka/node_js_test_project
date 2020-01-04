@@ -1,0 +1,23 @@
+#myProgress {
+	width: 100%;
+	background-color: grey;
+	text-align: center;
+	position: relative;
+}
+
+#myBar {
+	width: 0%;
+	height: 30px;
+	background-color: #4caf50;
+	line-height: 30px; /* To center it vertically */
+	color: white;
+}
+
+#barLabel {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	margin: auto;
+}
