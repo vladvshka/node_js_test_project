@@ -1,7 +1,8 @@
 const EventEmitter = require("events");
 const path = require("path");
 const fs = require("fs");
-const { logLine } = require("./helpers");
+
+import { logLine } from "../shared/index.js";
 
 const storageName = "storage.json";
 
@@ -21,7 +22,6 @@ class TaskQueue extends EventEmitter {
 		logLine("this.isTaskRunning", this.isTaskRunning);
 
 		if (!this.isTaskRunning) {
-			logLine("this.queue", this.queue);
 			if (this.queue.length > 0) {
 				const firstTask = this.queue.shift();
 				const taskPromise = firstTask();
@@ -79,8 +79,6 @@ const updateStorage = (taskQueue, newFileData) => {
 				});
 			});
 		});
-
-	logLine("task: ", task);
 
 	taskQueue.addTask(task);
 };

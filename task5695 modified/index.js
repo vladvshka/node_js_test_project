@@ -6,16 +6,10 @@ const uuidv1 = require("uuid/v1");
 const WebSocket = require("ws");
 const fsp = require("fs").promises;
 
-import {
-	KEEP_ALIVE,
-	CONNECTION_ID,
-	PROGRESS,
-	CLOSE_CONNECTION_ID,
-} from "./shared/index.js";
+import { CONNECTION_ID, PROGRESS, logLine } from "./shared/index.js";
 import { WebSocketsWatcher } from "./utils/webSocketsHelpers";
 
 const { TaskQueue, updateStorage } = require("./utils/storageHelpers");
-const { logLine } = require("./utils/helpers");
 
 const webserver = express();
 const port = 7180;
@@ -41,13 +35,6 @@ wsServer.on("connection", connection => {
 			logLine("connectionId from client: ", connectionId);
 
 			WsWatcher.addClient(connection, connectionId);
-		} else if (data[CLOSE_CONNECTION_ID]) {
-			const connectionId = data[CLOSE_CONNECTION_ID];
-			connection.close(1000, "Finished");
-
-			logLine("connectionId closed from client: ", connectionId);
-
-			WsWatcher.removeClient(connectionId);
 		}
 	});
 });
@@ -85,7 +72,7 @@ webserver.post("/upload", (req, res) => {
 	if (!connectionId) {
 		res
 			.status(400)
-			.send("Request headers are incomplete. connectionId is missing.");
+			.send("Request headers are incomplete. CONNECTION_ID is missing.");
 	}
 
 	bodyProgress.on("progress", info => {
@@ -104,6 +91,9 @@ webserver.post("/upload", (req, res) => {
 	req.pipe(bodyProgress);
 	bodyProgress.headers = req.headers;
 
+	/**
+	 * Starts, when uploading progress is over.
+	 */
 	attachment(bodyProgress, res, err => {
 		if (err) {
 			res.status(500);
@@ -119,16 +109,25 @@ webserver.post("/upload", (req, res) => {
 
 		updateStorage(taskQueue, fileData);
 
+		/**
+		 * Starts, when storage updating progress is over or failed.
+		 */
 		taskQueue
 			.on("done", id => {
 				if (id === fileId) {
 					logLine("Client's file is uploaded and stored.");
+
+					WsWatcher.closeConnection(connectionId);
+
 					res.redirect(302, "/history");
 				}
 			})
 			.on("error", id => {
 				if (id === fileId) {
-					logLine("Client's file saving error.");
+					logLine("Client's file saving error!");
+
+					WsWatcher.closeConnection(connectionId);
+
 					res.redirect(302, "/history");
 				}
 			});

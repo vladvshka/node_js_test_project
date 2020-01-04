@@ -1,28 +1,8 @@
-const { logLine } = require("./helpers");
-
-import { CLIENT_TIMEOUT } from "../shared/index";
+import { logLine } from "../shared/index.js";
 
 export class WebSocketsWatcher {
 	constructor() {
 		this.clients = [];
-		this.initWatcher();
-	}
-
-	initWatcher() {
-		setInterval(() => {
-			if (this.clients.length > 0) {
-				const currentClients = this.clients;
-
-				currentClients.forEach(client => {
-					if (Date.now() - client.lastkeepalive > CLIENT_TIMEOUT * 3) {
-						client.connection.terminate(); // если клиент уже давно не отчитывался что жив - закрываем соединение
-						client.connection = null;
-					}
-				});
-
-				this.clients = currentClients.filter(client => client.connection);
-			}
-		}, 3000);
 	}
 
 	addClient(connection, connectionId) {
@@ -42,13 +22,12 @@ export class WebSocketsWatcher {
 		);
 	}
 
-	updateConnectionTime(connectionId) {
-		this.clients.forEach(client => {
-			if (client.connectionId === connectionId) {
-				logLine("KEEP_ALIVE from client:", client.connectionId);
-				client.lastkeepalive = Date.now();
-			}
-		});
+	closeConnection(connectionId) {
+		const connection = this.getConnectionById(connectionId);
+		connection.close(1000, "Finished");
+		this.removeClient(connectionId);
+
+		logLine("connectionId closed from client: ", connectionId);
 	}
 
 	getConnectionById(connectionId) {

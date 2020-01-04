@@ -14,3 +14,4 @@ require("@babel/register")({
 
 require("./index"); // этот require бабель перекрыл (благодаря @babel/register) и уже транспилирует код перед тем как Node.js его выполнит
 require("./utils/webSocketsHelpers");
+require("./utils/storageHelpers");

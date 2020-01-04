@@ -1,15 +1,16 @@
-import {
-	KEEP_ALIVE,
-	CONNECTION_ID,
-	PROGRESS,
-	CLIENT_TIMEOUT,
-	CLOSE_CONNECTION_ID,
-	uuidv4,
-} from "../shared/index.js";
+import { CONNECTION_ID, PROGRESS, logLine } from "../shared/index.js";
 
 (async () => {
 	// TODO: move id generation to server. Make another req after GET of the main page.
-	const connectionId = uuidv4();
+	const uuidv4 = () => {
+		return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+			(
+				c ^
+				(crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+			).toString(16)
+		);
+	};
+
 	let connection = null;
 
 	const updateProgressBar = progress => {
@@ -23,16 +24,8 @@ import {
 		}
 	};
 
-	const closeWsConnection = () => {
-		const connectionMsg = JSON.stringify({
-			[CLOSE_CONNECTION_ID]: connectionId,
-		});
-
-		console.log("Client closing connectionMsg: ", connectionMsg);
-		connection.send(connectionMsg);
-	};
-
 	const establishWebSocketConnection = () => {
+		const connectionId = uuidv4();
 		const url = `ws://${window.location.hostname}:7181/`;
 		/**
 		 * Web socket protocol supports text and binary data.
@@ -43,12 +36,12 @@ import {
 		connection.onopen = () => {
 			const connectionMsg = JSON.stringify({ [CONNECTION_ID]: connectionId });
 
-			console.log("Client connectionMsg: ", connectionMsg);
+			logLine("Client connectionMsg: ", connectionMsg);
 			connection.send(connectionMsg);
 		};
 
 		connection.onmessage = msg => {
-			console.log("клиентом получено сообщение от сервера: " + msg.data);
+			logLine("клиентом получено сообщение от сервера: " + msg.data);
 			const data = JSON.parse(msg.data);
 
 			if (data[PROGRESS]) {
@@ -58,20 +51,15 @@ import {
 		};
 
 		connection.onerror = error => {
-			console.log("WebSocket error:", error);
+			logLine("WebSocket error:", error);
 		};
 
 		connection.onclose = event => {
-			console.log(
-				`соединение с сервером закрыто: ${event.code}, ${event.reason}`
-			);
+			logLine(`соединение с сервером закрыто: ${event.code}, ${event.reason}`);
 			connection = null;
-			// clearInterval(keepAliveTimer);
 		};
 
-		// const keepAliveTimer = setInterval(() => {
-		// 	connection.send(KEEP_ALIVE);
-		// }, CLIENT_TIMEOUT);
+		return connectionId;
 	};
 
 	const handleUpload = async e => {
@@ -81,6 +69,7 @@ import {
 		const form = document.getElementById("form");
 
 		const formData = new FormData(form);
+		const connectionId = establishWebSocketConnection();
 
 		// File attachment and connectionId is a must!
 		if (!connectionId || formData.get("attachment").size === 0) {
@@ -92,15 +81,11 @@ import {
 		const myProgress = document.getElementById("myProgress");
 		myProgress.style.visibility = "visible";
 
-		establishWebSocketConnection();
-
 		try {
 			const response = await fetch(url, {
 				method: "POST",
 				body: formData,
 			});
-
-			closeWsConnection();
 
 			// Have to handle redirect manually, as default POST handler has been rewritten by handleUpload.
 			window.location = response.url;
