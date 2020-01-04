@@ -14,10 +14,8 @@ head
         input(type='text' name='comment' class="form-control")
         br
         .input-group.mb-3
-            .custom-file
-                input#inputGroupFile01.custom-file-input(type='file' name='attachment' aria-describedby='inputGroupFileAddon01')
-                label.custom-file-label(for='inputGroupFile01') Choose file
-        br
+            input(type='file' name='attachment')
+        br  
         input(type='submit' value='Upload' class="btn btn-success")
     #myProgress
         #myBar
