@@ -35,23 +35,25 @@ webServer.use((err, req, res, next) => {
 	res.sendStatus(err.status || 500);
 });
 
-webServer.get("/", (req, res) => res.render("main"));
+// chainable route handlers
+webServer
+	.route("/")
+	.get((req, res) => res.render("main"))
+	.post(upload.none(), async (req, res) => {
+		console.log("body: ", req.body);
+		// add shared validation on empty!
 
-webServer.post("/", upload.none(), async (req, res) => {
-	console.log("body: ", req.body);
-	// add shared validation on empty!
+		const fullUrl = getFullUrl(req.body);
+		const options = getOptions(req.body);
 
-	const fullUrl = getFullUrl(req.body);
-	const options = getOptions(req.body);
+		// const result = await makeRequest(fullUrl, options);
 
-	// const result = await makeRequest(fullUrl, options);
+		// console.log("result", result);
 
-	// console.log("result", result);
+		// use target: _top?
+		res.render("main", { shouldShowResponse: true });
 
-	// use target: _top?
-	res.render("main", { shouldShowResponse: true });
-
-	// res.sendStatus(200);
-});
+		// res.sendStatus(200);
+	});
 
 webServer.listen(port, () => console.log(`Postman listening on port ${port}!`));

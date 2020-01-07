@@ -1,20 +1,20 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const bodyParser = require('body-parser');
-const querystring = require('querystring');
+const express = require("express");
+const { body, validationResult } = require("express-validator");
+const bodyParser = require("body-parser");
+const querystring = require("querystring");
 
-const users = require('./users.json');
+const users = require("./users.json");
 
 const webserver = express();
 
 webserver.use(bodyParser.urlencoded({ extended: false }));
 
 const port = 7180;
-const method = 'post';
+const method = "post";
 const action = `/login`;
 
-const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
-    const view = `
+const getViewPage = ({ formView = "", errorMsg = "", resultsView = "" }) => {
+	const view = `
     <!DOCTYPE html>
     <html style="box-sizing: border-box;">
     <head style="box-sizing: border-box;">
@@ -37,11 +37,11 @@ const getViewPage = ({formView = '', errorMsg = '', resultsView = '' }) => {
     </body>
     </html>`;
 
-    return view;
-}
+	return view;
+};
 
-const getResultsView = (username = '', password = '') => {
-    const resultsView = `
+const getResultsView = (username = "", password = "") => {
+	const resultsView = `
         <h3 style="box-sizing: border-box;text-align:center;">Welcome:</h3>
         <div class="control-group" style="box-sizing:border-box;margin-bottom:10px;">
         <input type="text" class="login-field" value="${username}" id="login-name" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-user" for="login-name" style="box-sizing: border-box;"></label>
@@ -51,17 +51,18 @@ const getResultsView = (username = '', password = '') => {
         <input type="text" class="login-field" value="${password}" id="login-pass" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-lock" for="login-pass" style="box-sizing: border-box;"></label>
         </div>`;
 
-    return getViewPage({ resultsView });
-}
+	return getViewPage({ resultsView });
+};
 
 const getLoginForm = (withErrors = false) => {
-    let errorMsg = '';
+	let errorMsg = "";
 
-    if (withErrors) {
-        errorMsg = '<span class="login-link" text-align="center" style="box-sizing:border-box;text-align:center;font-size:12px;color:#ea1515;display:block;margin-top:12px;">Please, validate your creds</span>';
-    }
+	if (withErrors) {
+		errorMsg =
+			'<span class="login-link" text-align="center" style="box-sizing:border-box;text-align:center;font-size:12px;color:#ea1515;display:block;margin-top:12px;">Please, validate your creds</span>';
+	}
 
-    const formView = `
+	const formView = `
         <form method="${method}" ${action} class="login-form" style="box-sizing:border-box;text-align:center;">
             <div class="control-group" style="box-sizing:border-box;margin-bottom:10px;">
             <input type="text" class="login-field" name="username" placeholder="username" id="login-name" style="box-sizing:border-box;text-align:center;background-color:#ECF0F1;border:2px solid transparent;border-radius:3px;font-size:16px;font-weight:200;padding:10px 0;width:250px;transition:border .5s;"><label class="login-field-icon fui-user" for="login-name" style="box-sizing: border-box;"></label>
@@ -75,41 +76,53 @@ const getLoginForm = (withErrors = false) => {
             <a class="login-link" href="#" style="box-sizing:border-box;font-size:12px;color:#444;display:block;margin-top:12px;">Lost your password?</a>
         </form>`;
 
-    return getViewPage({ formView, errorMsg });
-}
+	return getViewPage({ formView, errorMsg });
+};
 
-const areValidCreds = ({ username, password }) => 
-    !!users.validUsers.find(creds => creds.login === username && creds.password === password);
+const areValidCreds = ({ username, password }) =>
+	!!users.validUsers.find(
+		creds => creds.login === username && creds.password === password
+	);
 
-webserver.get('/login', (req, res) => {
-    res.send(getLoginForm());
+webserver.get("/welcome", (req, res) => {
+	const { username, password } = req.query;
+	res.send(getResultsView(username, password));
 });
 
-webserver.get('/welcome', (req, res) => {
-    const { username, password } = req.query;
-    res.send(getResultsView(username, password));
+webServer
+	.route("/login")
+	.get((req, res) => {
+		res.send(getLoginForm());
+	})
+	.post(
+		[
+			body("username")
+				.exists()
+				.isLength({ min: 3 }),
+			body("password")
+				.exists()
+				.isLength({ min: 3 }),
+		],
+		(req, res) => {
+			const errors = validationResult(req);
+			const bodyParams = Object.keys(req.body);
+
+			if (bodyParams.length > 0 && !errors.isEmpty()) {
+				res.send(getLoginForm(true));
+			} else {
+				const { username, password } = req.body;
+
+				if (areValidCreds(req.body)) {
+					const query = querystring.stringify({ username, password });
+
+					res.redirect(301, `/welcome?${query}`);
+				} else {
+					res.redirect(301, "/login");
+				}
+			}
+		}
+	);
+
+webserver.listen(port, () => {
+	console.log(`Validation server is listening on ${port} port`);
 });
-
-webserver.post('/login', [
-    body('username').exists().isLength({ min: 3 }),
-    body('password').exists().isLength({ min: 3 }),
-], (req, res) => {
-    const errors = validationResult(req);
-    const bodyParams = Object.keys(req.body);
-
-    if (bodyParams.length > 0 && !errors.isEmpty()) {
-        res.send(getLoginForm(true));
-    } else {
-        const { username, password } = req.body;
-
-        if (areValidCreds(req.body)) {
-            const query = querystring.stringify({ username, password });
-
-            res.redirect(301, `/welcome?${query}`);
-        } else {
-            res.redirect(301, '/login');
-        }
-    }
-});
-
-webserver.listen(port, () => {console.log(`Validation server is listening on ${port} port`)});
