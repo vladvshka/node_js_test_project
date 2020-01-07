@@ -1,23 +1,22 @@
-const mariadb = require("mariadb");
+const express = require("express");
+const path = require("path");
+const favicon = require("serve-favicon");
 
-const pool = mariadb.createPool({
-	host: "localhost",
-	user: "root",
-	password: "1234",
-	connectionLimit: 5,
-	database: "test",
-});
+const { router } = require("./utils/router");
+const { logLine } = require("./utils/helpers");
 
-(async function asyncFunction() {
-	let conn;
-	try {
-		conn = await pool.getConnection();
-		const rows = await conn.query("SHOW DATABASES;");
-		console.log(rows); //[ {val: 1}, meta: ... ]
-	} catch (err) {
-		console.log("err", err);
-		throw err;
-	} finally {
-		if (conn) return conn.end();
-	}
-})();
+const webserver = express();
+const port = 7180;
+
+webserver.use(favicon(path.join(__dirname, "static", "favicon.ico")));
+webserver.use("/explorer", express.static(path.join(__dirname, "static")));
+// webserver.use(bodyParser.urlencoded({ extended: false }));
+
+webserver.set("view engine", "pug"); // устанавливаем, что будет использоваться именно движок шаблонов pug
+webserver.set("views", path.join(__dirname, "views")); // задаём папку, в которой будут шаблоны
+
+webserver.use("/explorer", router);
+
+webserver.listen(port, () =>
+	logLine(`File uploader listening on port ${port}!`)
+);
