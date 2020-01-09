@@ -8,11 +8,13 @@ head
     title SQL Explorer
 .container
     form#form(action='/explorer/execute_query' method='post' enctype='multipart/form-data')
+        if databases
+            include databases_list.pug
         | Your SQL: 
         .input-group
             .input-group-prepend
                 span.input-group-text SQL query
-            textarea.form-control(aria-label='With textarea' name="queryText") Show Databases
+            textarea.form-control(aria-label='With textarea' name="queryText" rows="8" cols="50") Show Tables
         br
         input(type='submit' value='Execute' class="btn btn-success")
     if results

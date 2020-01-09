@@ -1,0 +1,10 @@
+div
+    | Select Database:
+    .input-group.mb-3
+        select#inputGroupSelect02.custom-select(name="dataBase")
+            option(value='') None
+            each db in databases
+                if selectedDb && db === selectedDb
+                    option(value=db selected=true)= db
+                else
+                    option(value=db selected=false)= db

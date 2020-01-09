@@ -10,7 +10,6 @@ const port = 7180;
 
 webserver.use(favicon(path.join(__dirname, "static", "favicon.ico")));
 webserver.use("/explorer", express.static(path.join(__dirname, "static")));
-// webserver.use(bodyParser.urlencoded({ extended: false }));
 
 webserver.set("view engine", "pug"); // устанавливаем, что будет использоваться именно движок шаблонов pug
 webserver.set("views", path.join(__dirname, "views")); // задаём папку, в которой будут шаблоны

@@ -2,7 +2,13 @@ const express = require("express");
 const mysql = require("mysql");
 const multer = require("multer");
 
-const { getConnectionFromPool, executeSelectQuery } = require("./dbService");
+const { logLine, parseQueryText } = require("./helpers");
+const {
+	getConnectionFromPool,
+	executeQuery,
+	utilQueries,
+	changeDbName,
+} = require("./dbService");
 const {
 	handleDBconnectionError,
 	handleQueryError,
@@ -18,12 +24,44 @@ let pool = mysql.createPool({
 	password: "1234",
 });
 
-router.get("/", (req, res) => {
-	res.render("main");
+const getAllDatabases = async res => {
+	let connection = null;
+
+	try {
+		connection = await getConnectionFromPool(pool);
+
+		try {
+			const results = await executeQuery(connection, utilQueries.getDatabases);
+			const databasesList = results.map(db => db.Database);
+
+			return databasesList;
+		} catch (error) {
+			handleQueryError(error, res);
+			return null;
+		}
+	} catch (error) {
+		handleDBconnectionError(error, res);
+		return null;
+	} finally {
+		if (connection) {
+			connection.release();
+		}
+	}
+};
+
+router.get("/", async (req, res) => {
+	const results = await getAllDatabases(res);
+
+	if (results) {
+		res.render("main", { databases: results });
+	}
 });
 
 router.post("/execute_query", upload.none(), async (req, res) => {
-	const { queryText } = req.body;
+	let { queryText } = req.body;
+	const { dataBase } = req.body;
+	logLine("queryText", queryText);
+	logLine("dataBase", dataBase);
 
 	let connection = null;
 
@@ -32,9 +70,23 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 			connection = await getConnectionFromPool(pool);
 
 			try {
-				const results = await executeSelectQuery(connection, queryText);
+				if (dataBase) {
+					await changeDbName(connection, dataBase);
+				}
 
-				res.render("main", { results: JSON.stringify(results) });
+				let results = await executeQuery(connection, parseQueryText(queryText));
+
+				if (results.affectedRows && results.affectedRows > 0) {
+					results = { affectedRows: results.affectedRows };
+				}
+
+				const databases = await getAllDatabases(res);
+
+				res.render("main", {
+					results: JSON.stringify(results),
+					databases,
+					selectedDb: dataBase,
+				});
 			} catch (error) {
 				handleQueryError(error, res);
 			}

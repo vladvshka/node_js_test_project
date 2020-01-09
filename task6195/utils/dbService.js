@@ -9,7 +9,7 @@ const getConnectionFromPool = pool => {
 	});
 };
 
-const executeSelectQuery = (connection, queryText) => {
+const executeQuery = (connection, queryText) => {
 	return new Promise((resolve, reject) => {
 		connection.query(queryText, (err, results, fields) => {
 			if (err) {
@@ -20,7 +20,24 @@ const executeSelectQuery = (connection, queryText) => {
 	});
 };
 
+const changeDbName = (connection, dbName) => {
+	return new Promise((resolve, reject) => {
+		connection.changeUser({ database: dbName }, err => {
+			if (err) {
+				reject(err); // failed request
+			}
+			resolve(true);
+		});
+	});
+};
+
+const utilQueries = {
+	getDatabases: "SHOW DATABASES;",
+};
+
 module.exports = {
 	getConnectionFromPool,
-	executeSelectQuery,
+	executeQuery,
+	utilQueries,
+	changeDbName,
 };
