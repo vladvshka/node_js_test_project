@@ -2,12 +2,16 @@ const { logLine } = require("./helpers");
 
 const handleDBconnectionError = (err, res) => {
 	logLine(err);
-	res.sendStatus(500);
+	res.status(500).send("Internal server error.");
 };
 
-const handleQueryError = (err, res) => {
+const handleQueryError = (err, databases, res) => {
 	logLine(err);
-	res.sendStatus(400);
+
+	res.render("main", {
+		databases,
+		error: "400: Bad request!",
+	});
 };
 
 module.exports = {

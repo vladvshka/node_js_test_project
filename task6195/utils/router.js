@@ -50,10 +50,14 @@ const getAllDatabases = async res => {
 };
 
 router.get("/", async (req, res) => {
-	const results = await getAllDatabases(res);
+	try {
+		const results = await getAllDatabases(res);
 
-	if (results) {
-		res.render("main", { databases: results });
+		if (results) {
+			res.render("main", { databases: results });
+		}
+	} catch (error) {
+		handleDBconnectionError(error, res);
 	}
 });
 
@@ -88,7 +92,9 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 					selectedDb: dataBase,
 				});
 			} catch (error) {
-				handleQueryError(error, res);
+				const databases = await getAllDatabases(res);
+
+				handleQueryError(error, databases, res);
 			}
 		} catch (error) {
 			handleDBconnectionError(error, res);
