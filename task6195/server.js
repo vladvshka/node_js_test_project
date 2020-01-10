@@ -17,5 +17,5 @@ webserver.set("views", path.join(__dirname, "views")); // задаём папк�
 webserver.use("/explorer", router);
 
 webserver.listen(port, () =>
-	logLine(`File uploader listening on port ${port}!`)
+	logLine(`SQL explorer listening on port ${port}!`)
 );
