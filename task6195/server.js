@@ -15,6 +15,9 @@ webserver.set("view engine", "pug"); // устанавливаем, что бу�
 webserver.set("views", path.join(__dirname, "views")); // задаём папку, в которой будут шаблоны
 
 webserver.use("/explorer", router);
+webserver.get("/", (req, res) => {
+	res.redirect(302, "/explorer");
+});
 
 webserver.listen(port, () =>
 	logLine(`SQL explorer listening on port ${port}!`)

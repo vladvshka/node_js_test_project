@@ -10,7 +10,7 @@ const handleQueryError = (err, databases, res) => {
 
 	res.render("main", {
 		databases,
-		error: "400: Bad request!",
+		error: `${err.code}: ${err.sqlMessage}`,
 	});
 };
 
