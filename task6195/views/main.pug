@@ -16,9 +16,12 @@ head
         .input-group
             .input-group-prepend
                 span.input-group-text SQL query
-            textarea.form-control(aria-label='With textarea' name="queryText" rows="8" cols="50")
+            if request
+                textarea.form-control(aria-label='With textarea' name="queryText" rows="8" cols="50")= request
+            else
+                textarea.form-control(aria-label='With textarea' name="queryText" rows="8" cols="50")
         br
         input(type='submit' value='Execute' class="btn btn-success")
     if results
-        include response.pug
+        include response.pug 
 script(type='module' src='./index.js')

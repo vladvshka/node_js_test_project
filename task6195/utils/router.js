@@ -78,7 +78,9 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 					await changeDbName(connection, dataBase);
 				}
 
-				let results = await executeQuery(connection, parseQueryText(queryText));
+				const clearedQuery = parseQueryText(queryText);
+
+				let results = await executeQuery(connection, clearedQuery);
 
 				if (results.affectedRows && results.affectedRows > 0) {
 					results = { affectedRows: results.affectedRows };
@@ -90,6 +92,7 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 					results: JSON.stringify(results),
 					databases,
 					selectedDb: dataBase,
+					request: clearedQuery,
 				});
 			} catch (error) {
 				const databases = await getAllDatabases(res);
@@ -106,6 +109,11 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 	} else {
 		res.redirect(302, "/");
 	}
+});
+
+// Wrong URLs' handler
+router.get("*", (req, res) => {
+	res.status(404).send("Sorry, such page doesn't exist!");
 });
 
 module.exports = {

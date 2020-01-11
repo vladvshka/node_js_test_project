@@ -4,10 +4,15 @@ const logLine = (...args) => {
 };
 
 const parseQueryText = query => {
-	if (!query.endsWith(";")) {
-		return (query += ";");
+	let clearQuery = query
+		.replace("\t", "")
+		.replace("\r\n", "")
+		.replace("\n", "");
+
+	if (!clearQuery.endsWith(";")) {
+		return (clearQuery += ";");
 	}
-	return query;
+	return clearQuery;
 };
 
 module.exports = {
