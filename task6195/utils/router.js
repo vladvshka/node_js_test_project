@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const multer = require("multer");
 
-const { logLine, parseQueryText } = require("./helpers");
+const { logLine, parseQueryText, parseResults } = require("./helpers");
 const {
 	getConnectionFromPool,
 	executeQuery,
@@ -88,8 +88,12 @@ router.post("/execute_query", upload.none(), async (req, res) => {
 
 				const databases = await getAllDatabases(res);
 
+				const isInTables =
+					clearedQuery.toUpperCase().includes("SELECT") ||
+					clearedQuery.toUpperCase().includes("SHOW");
+
 				res.render("main", {
-					results: JSON.stringify(results),
+					results: parseResults(isInTables, results),
 					databases,
 					selectedDb: dataBase,
 					request: clearedQuery,

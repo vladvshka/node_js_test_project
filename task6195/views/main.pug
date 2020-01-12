@@ -12,7 +12,6 @@ head
     form#form(action='/explorer/execute_query' method='post' enctype='multipart/form-data')
         if databases
             include databases_list.pug
-        | Your SQL: 
         .input-group
             .input-group-prepend
                 span.input-group-text SQL query
@@ -23,5 +22,4 @@ head
         br
         input(type='submit' value='Execute' class="btn btn-success")
     if results
-        include response.pug 
-script(type='module' src='./index.js')
+        include response.pug
