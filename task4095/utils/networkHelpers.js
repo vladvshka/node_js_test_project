@@ -1,3 +1,6 @@
+const fetch = require("isomorphic-fetch");
+const { logLine } = require("./helpers");
+
 const getKeyValueObject = (body, name) => {
 	const keyValueObject = Object.keys(body).reduce((accum, item) => {
 		if (item.startsWith(`${name}Key`)) {
@@ -20,35 +23,22 @@ const getKeyValueObject = (body, name) => {
 		return accum;
 	}, {});
 
-	console.log(`${name}Object`, keyValueObject);
+	logLine(`${name}Object`, keyValueObject);
 
 	return keyValueObject;
-};
-
-const isJsonValid = structure => {
-	if (typeof structure !== "string") {
-		return false;
-	}
-	try {
-		JSON.parse(structure);
-
-		return true;
-	} catch (error) {
-		return false;
-	}
 };
 
 const getFullUrl = body => {
 	const paramsObject = getKeyValueObject(body, "param");
 	const searchParams = new URLSearchParams(paramsObject);
-	console.log("searchParams", searchParams);
+	logLine("searchParams", searchParams);
 
 	const url = new URL(body.url);
-	console.log("url", url);
+	logLine("url", url);
 
 	url.search = searchParams;
 
-	console.log("url new", url);
+	logLine("url new", url);
 
 	return url;
 };
@@ -59,18 +49,19 @@ const makeRequest = async (fullUrl, options) => {
 
 		if (proxy_response.ok) {
 			const responseText = await proxy_response.text();
+			data = responseText;
 
-			if (isJsonValid(responseText)) {
-				const data = JSON.parse(responseText);
-
-				return data;
-			}
-
-			return responseText;
+			return {
+				data,
+				status: proxy_response.status,
+				statusText: proxy_response.statusText,
+				headers: JSON.stringify(proxy_response.headers._headers, null, 3),
+				contentType: proxy_response.headers._headers["content-type"],
+			};
 		}
 	} catch (error) {
 		console.error("error", error);
-		return null;
+		throw new Error(error);
 	}
 };
 
@@ -89,7 +80,7 @@ const getOptions = reqBody => {
 		options.body = body;
 	}
 
-	console.log("options", options);
+	logLine("options", options);
 
 	return options;
 };

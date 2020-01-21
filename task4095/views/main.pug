@@ -4,60 +4,66 @@ head
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     meta(http-equiv='Content-Type' content='text/html; charset=UTF-8')
     link(rel='stylesheet' href='style.css' type='text/css')
+    link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
     title Postman
-div
-    // Request
-    form#requestForm(action='/' method='POST' enctype='multipart/form-data')
-        div
-            // method, url
-            h4 Request details
-            div
-                // method
-                select(name='method' required='')
-                    option(value='GET') GET
-                    option(value='POST') POST
-                // url
-                label(for='urlField') URL: 
-                input#urlField(type='text' name='url' required='')
-            // params
-            h4 Query parameters
-            div
-                // headings
+.container
+    .row
+        if history
+            include history.pug
+        .col
+            // Request
+            form#requestForm(action='/fetch' method='POST' enctype='multipart/form-data')
                 div
-                    span Key
-                    span  Value
-                // key-value
-                #paramGroup
-                    div
-                        input#paramKey1(type='text' name='paramKey1' value='test')
-                        input#paramValue1(type='text' name='paramValue1' value='1')
-                button#addParam(type='button') Add
-            // headers
-            h4 Query parameters
-            div
-                // headings
-                div
-                    span Header
-                    span  Value
-                // key-value
-                #headerGroup
-                    div
-                        input#headerKey1(type='text' name='headerKey1')
-                        input#headerValue1(type='text' name='headerValue1')
-                button#addHeader(type='button') Add
-            // content-type
-            h4 Content-type
-            div
-                select(name='content-type')
-                    option(value='application/json') application/json
-                    option(value='application/xml') application/xml
-                    option(value='text/html') text/html
-            // body
-            h4 Request body
-            div
-                textarea#body(name='body' cols='60' rows='30')
-    button(form='requestForm' type='submit') Make a request
-    // Response
-    if shouldShowResponse
-        include response.pug
+                    // method, url
+                    h5 Request details
+                    .form-group
+                        // method
+                        label(for='method') Method: 
+                        select#method(class='form-control' name='method' required='')
+                            option(value='GET') GET
+                            option(value='POST') POST
+                        // url
+                        label(for='urlField') URL: 
+                        input#urlField(class='form-control' type='text' name='url' required='' value="https://reqbin.com/echo/post/json")
+                    // params
+                    h5 Query parameters
+                    .form-group
+                        // headings
+                        div
+                            span Key
+                            span  Value
+                        // key-value
+                        #paramGroup
+                            div
+                                input#paramKey1(type='text' name='paramKey1')
+                                input#paramValue1(type='text' name='paramValue1')
+                        button#addParam(type='button' class="btn btn-success") Add
+                    // headers
+                    h5 Query parameters
+                    .form-group
+                        // headings
+                        div
+                            span Header
+                            span  Value
+                        // key-value
+                        #headerGroup
+                            div
+                                input#headerKey1(type='text' name='headerKey1')
+                                input#headerValue1(type='text' name='headerValue1')
+                        button#addHeader(type='button' class="btn btn-success") Add
+                    // content-type
+                    h5 Content-type
+                    .form-group
+                        select(class='form-control' name='content-type')
+                            option(value='application/json') application/json
+                            option(value='application/xml') application/xml
+                            option(value='text/html') text/html
+                    // body
+                    h5 Request body
+                    .form-group
+                        textarea#body(class='form-control' name='body' cols='60' rows='30')
+                button(form='requestForm' type='submit' class="btn btn-primary mb-2") Make a request
+        .col
+            if response
+                include response.pug
 script(src='index.js')

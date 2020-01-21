@@ -1,4 +1,10 @@
-div
-    h4 Response body
-    textarea#body(name='body' cols='60' rows='30')
-    
+h5 Response status
+input(type='text' class='form-control' name='status' value=`${response.status}`)
+h5 Response statusText
+input(type='text' class='form-control' name='statusText' value=`${response.statusText}`)
+h5 Response content-type
+input(type='text' class='form-control' name='contentType' value=`${response.contentType}`)
+h5 Response headers
+textarea#headers(class='form-control' name='headers' cols='50' rows='20')= response.headers
+h5 Response body
+textarea#response(class='form-control' name='data' cols='60' rows='30')= response.data

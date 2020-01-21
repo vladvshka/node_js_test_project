@@ -1,30 +1,4 @@
 (async () => {
-	// refactor form to contain array of params
-	const handleSubmit = async event => {
-		event.preventDefault();
-		event.stopPropagation();
-
-		const formData = new FormData(form);
-
-		// Display the key/value pairs
-		for (const pair of formData.entries()) {
-			console.log(pair[0] + ", " + pair[1]);
-		}
-
-		try {
-			const response = await fetch("/", {
-				method: "POST",
-				body: formData,
-			});
-
-			// if (response.ok) {
-			//     await updateStatistics();
-			// };
-		} catch (error) {
-			console.error("error", error);
-		}
-	};
-
 	const addGroup = groupName => {
 		const group = document.getElementById(`${groupName}Group`);
 
@@ -69,10 +43,6 @@
 
 		addGroup("param");
 	};
-
-	// Entry point.
-	const form = document.getElementById("requestForm");
-	form.addEventListener("submit", handleSubmit);
 
 	// Add params
 	const addParamButton = document.getElementById("addParam");
