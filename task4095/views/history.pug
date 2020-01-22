@@ -1,0 +1,10 @@
+.col
+    if historyList && historyList.length
+        h5 History
+        ul.list-group
+            each request in historyList
+                li.list-group-item.d-flex.justify-content-between.align-items-center
+                    = request.url
+                    span.badge.badge-primary.badge-pill= request.method
+                    form(action=`../repeat/${request.id}`, method="post")
+                        button(type="submit" class="btn btn-primary btn-sm history" id=`${request.id}`) Repeat

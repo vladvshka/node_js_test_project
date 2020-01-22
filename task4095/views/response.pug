@@ -5,6 +5,6 @@ input(type='text' class='form-control' name='statusText' value=`${response.statu
 h5 Response content-type
 input(type='text' class='form-control' name='contentType' value=`${response.contentType}`)
 h5 Response headers
-textarea#headers(class='form-control' name='headers' cols='50' rows='20')= response.headers
+textarea#headers(class='form-control' name='headers' cols='50' rows='15')= response.headers
 h5 Response body
-textarea#response(class='form-control' name='data' cols='60' rows='30')= response.data
+textarea#response(class='form-control' name='data' cols='60' rows='20')= response.data

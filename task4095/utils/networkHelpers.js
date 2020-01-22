@@ -1,5 +1,5 @@
-const fetch = require("isomorphic-fetch");
-const { logLine } = require("./helpers");
+import fetch from "isomorphic-fetch";
+import { logLine } from "./helpers";
 
 const getKeyValueObject = (body, name) => {
 	const keyValueObject = Object.keys(body).reduce((accum, item) => {
@@ -31,14 +31,11 @@ const getKeyValueObject = (body, name) => {
 const getFullUrl = body => {
 	const paramsObject = getKeyValueObject(body, "param");
 	const searchParams = new URLSearchParams(paramsObject);
-	logLine("searchParams", searchParams);
-
 	const url = new URL(body.url);
-	logLine("url", url);
 
 	url.search = searchParams;
 
-	logLine("url new", url);
+	logLine("Full URL: ", url);
 
 	return url;
 };
@@ -80,13 +77,9 @@ const getOptions = reqBody => {
 		options.body = body;
 	}
 
-	logLine("options", options);
+	logLine("Options: ", options);
 
 	return options;
 };
 
-module.exports = {
-	getFullUrl,
-	makeRequest,
-	getOptions,
-};
+export { getFullUrl, makeRequest, getOptions };

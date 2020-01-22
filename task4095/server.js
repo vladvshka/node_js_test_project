@@ -1,7 +1,7 @@
-const express = require("express");
-const path = require("path");
-const { logLine } = require("./utils/helpers");
-const { router } = require("./router");
+import express from "express";
+import path from "path";
+import { logLine } from "./utils/helpers";
+import { router } from "./router";
 
 const webServer = express();
 const port = 7180;
