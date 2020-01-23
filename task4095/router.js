@@ -25,13 +25,13 @@ router.post("/fetch", upload.none(), async (req, res) => {
 	try {
 		validateFormData(req.body);
 
-		const history = await dbService.getAllRequests();
-		const historyList = formHistoryList(history);
-
 		const fullUrl = getFullUrl(req.body);
 		const options = getOptions(req.body);
 
 		const response = await makeRequest(fullUrl, options);
+
+		const history = await dbService.getAllRequests();
+		const historyList = formHistoryList(history);
 
 		await dbService.saveRequest(fullUrl, options);
 
