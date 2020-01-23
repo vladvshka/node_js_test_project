@@ -24,7 +24,7 @@ const getKeyValueObject = (body, name) => {
 		return accum;
 	}, {});
 
-	logLine(`${name}Object`, keyValueObject);
+	// logLine(`${name}Object`, keyValueObject);
 
 	return keyValueObject;
 };
@@ -36,27 +36,21 @@ const getFullUrl = body => {
 
 	url.search = searchParams;
 
-	logLine("Full URL: ", url);
-
 	return url;
 };
 
 const makeRequest = async (fullUrl, options) => {
 	try {
 		const proxy_response = await fetch(fullUrl.href, options);
+		const responseText = await proxy_response.text();
 
-		if (proxy_response.ok) {
-			const responseText = await proxy_response.text();
-			data = responseText;
-
-			return {
-				data,
-				status: proxy_response.status,
-				statusText: proxy_response.statusText,
-				headers: JSON.stringify(proxy_response.headers._headers, null, 3),
-				contentType: proxy_response.headers._headers["content-type"],
-			};
-		}
+		return {
+			data: responseText,
+			status: proxy_response.status,
+			statusText: proxy_response.statusText,
+			headers: JSON.stringify(proxy_response.headers._headers, null, 3),
+			contentType: proxy_response.headers._headers["content-type"],
+		};
 	} catch (error) {
 		console.error("error", error);
 		throw new Error(error);
@@ -76,8 +70,6 @@ const getOptions = reqBody => {
 	if (method !== "GET") {
 		options.body = body;
 	}
-
-	logLine("Options: ", options);
 
 	return options;
 };

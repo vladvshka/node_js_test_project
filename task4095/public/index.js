@@ -56,11 +56,11 @@
 		) {
 			e.preventDefault();
 			e.stopPropagation();
-		}
 
-		document
-			.getElementsByClassName("alertFormHidden")[0]
-			.classList.toggle("alertFormHidden");
+			document
+				.getElementsByClassName("alertFormHidden")[0]
+				.classList.toggle("alertFormHidden");
+		}
 	};
 
 	// Add params
