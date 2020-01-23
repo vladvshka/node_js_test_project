@@ -1,8 +1,14 @@
 import express from "express";
 import multer from "multer";
+import assert from "assert";
 
-import { getFullUrl, makeRequest, getOptions } from "./utils/networkHelpers";
-import { formHistoryList } from "./utils/helpers";
+import {
+	getFullUrl,
+	makeRequest,
+	getOptions,
+	validateFormData,
+} from "./utils/networkHelpers";
+import { formHistoryList, logLine } from "./utils/helpers";
 import { dbService } from "./dbService";
 
 const upload = multer();
@@ -16,22 +22,26 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/fetch", upload.none(), async (req, res) => {
-	// add shared validation on empty!
-
-	const fullUrl = getFullUrl(req.body);
-	const options = getOptions(req.body);
-
 	try {
-		const response = await makeRequest(fullUrl, options);
-
-		await dbService.saveRequest(fullUrl, options);
+		validateFormData(req.body);
 
 		const history = await dbService.getAllRequests();
 		const historyList = formHistoryList(history);
 
+		const fullUrl = getFullUrl(req.body);
+		const options = getOptions(req.body);
+
+		const response = await makeRequest(fullUrl, options);
+
+		await dbService.saveRequest(fullUrl, options);
+
 		res.render("main", { response, historyList });
 	} catch (error) {
-		res.status(500).send(JSON.stringify(error));
+		if (error instanceof assert.AssertionError) {
+			res.status(400).render("main", { error: error.message });
+		} else {
+			res.status(500).send(JSON.stringify(error));
+		}
 	}
 });
 

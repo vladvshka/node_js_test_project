@@ -1,6 +1,6 @@
 import Sequelize from "sequelize";
 
-const RequestModel = {
+export const RequestModel = {
 	url: {
 		type: Sequelize.JSON,
 		allowNull: false,
@@ -10,5 +10,3 @@ const RequestModel = {
 		defaultValue: null,
 	},
 };
-
-export { RequestModel };

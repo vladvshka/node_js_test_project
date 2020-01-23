@@ -1,5 +1,6 @@
 import fetch from "isomorphic-fetch";
 import { logLine } from "./helpers";
+import assert from "assert";
 
 const getKeyValueObject = (body, name) => {
 	const keyValueObject = Object.keys(body).reduce((accum, item) => {
@@ -65,9 +66,8 @@ const makeRequest = async (fullUrl, options) => {
 // Options according to Fetch API.
 const getOptions = reqBody => {
 	const { method, body } = reqBody;
-	const headers = getKeyValueObject(reqBody, "header");
-
 	const options = { method };
+	const headers = getKeyValueObject(reqBody, "header");
 
 	if (Object.entries(headers).length !== 0) {
 		options.headers = headers;
@@ -82,4 +82,22 @@ const getOptions = reqBody => {
 	return options;
 };
 
-export { getFullUrl, makeRequest, getOptions };
+const validateFormData = reqBody => {
+	const { method, body, url } = reqBody;
+	const reg = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+
+	assert.doesNotThrow(() => {
+		const urlMatches = url.match(reg);
+		if (!urlMatches) {
+			throw new Error("Incorrect URL address!");
+		}
+		if (!["POST", "GET"].includes(method)) {
+			throw new Error("Not supported HTTP method!");
+		}
+		if (method === "POST" && !body) {
+			throw new Error("POST without sending body is not valid!");
+		}
+	});
+};
+
+export { getFullUrl, makeRequest, getOptions, validateFormData };
