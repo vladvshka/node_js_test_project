@@ -7,6 +7,8 @@ head
     link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
     title Postman
 .container
+    div
+        .alertFormHidden.alert.alert-danger(role='alert') Errors found in input form
     if error
         include error.pug
     .row
@@ -64,7 +66,7 @@ head
                     h5 Request body
                     .form-group
                         textarea#body(class='form-control' name='body' cols='60' rows='20')
-                button(form='requestForm' type='submit' class="btn btn-primary mb-2") Make a request
+                button#submit(form='requestForm' type='submit' class="btn btn-primary mb-2") Make a request
         .col
             if response
                 include response.pug
