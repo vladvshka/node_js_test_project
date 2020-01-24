@@ -29,11 +29,9 @@ router.post("/fetch", upload.none(), async (req, res) => {
 		const options = getOptions(req.body);
 
 		const response = await makeRequest(fullUrl, options);
-
+		await dbService.saveRequest(fullUrl, options);
 		const history = await dbService.getAllRequests();
 		const historyList = formHistoryList(history);
-
-		await dbService.saveRequest(fullUrl, options);
 
 		res.render("main", { response, historyList });
 	} catch (error) {
