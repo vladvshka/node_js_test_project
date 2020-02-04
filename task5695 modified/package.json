@@ -19,6 +19,7 @@
 		"progress-stream": "^2.0.0",
 		"pug": "^2.0.4",
 		"sequelize": "^5.21.3",
+		"serve-favicon": "^2.5.0",
 		"uuid": "^3.3.3",
 		"ws": "^7.2.1"
 	},
