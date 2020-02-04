@@ -26,7 +26,7 @@ const sequelize = new Sequelize(
 const User = sequelize.define("user", UserModel);
 
 sequelize
-	.authenticate()
+	.sync() // Sequelize automatically creates/upd all tables according to model definitions
 	.then(() => {
 		console.log("Connection to database has been established successfully.");
 	})

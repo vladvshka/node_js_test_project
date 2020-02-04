@@ -14,6 +14,7 @@ import { getSessionConfigs } from "./configs/sessionConfigs.js";
 
 const webserver = express();
 const port = 7180;
+
 // Custom session store for express-session based on Sequilize.
 const SequelizeStore = sessionStoreConnector(session.Store);
 const sessionStore = new SequelizeStore({
@@ -23,10 +24,9 @@ const sessionStore = new SequelizeStore({
 
 // init WS-server
 const wsServer = new WebSocket.Server({ port: 7181 });
+
 // generate session options, sessionStore is used as store for sessions
 const sessionOptions = getSessionConfigs(sessionStore);
-// Sequelize automatically creates/upd all tables according to model definitions
-sessionStore.sync();
 
 /**
  * Every new client sends an ID. The connection is stored and handled by webSocketsWatcher.
