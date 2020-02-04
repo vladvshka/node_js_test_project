@@ -82,7 +82,7 @@ authRouter.post("/sign-in", upload.none(), async (req, res) => {
 
 	try {
 		const user = await dbService.findUserByLogin(login);
-		logLine(`user: ${user}`);
+
 		if (user) {
 			const passwordFromDb = user.password;
 			const isEmailVerified = user.isVerified;
@@ -101,6 +101,8 @@ authRouter.post("/sign-in", upload.none(), async (req, res) => {
 						.status(403)
 						.render("authForm", { signIn: true, verifyEmail: true });
 				}
+			} else {
+				res.status(404).render("authForm", { signIn: true, noUser: true });
 			}
 		} else {
 			res.status(404).render("authForm", { signIn: true, noUser: true });
