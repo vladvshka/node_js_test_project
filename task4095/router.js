@@ -8,7 +8,7 @@ import {
 	getOptions,
 	validateFormData,
 } from "./utils/networkHelpers";
-import { formHistoryList, logLine } from "./utils/helpers";
+import { formHistoryList } from "./utils/helpers";
 import { dbService } from "./dbService";
 
 const upload = multer();

@@ -6,6 +6,7 @@ head
     link(rel='stylesheet' type='text/css' href='style.css')
     link(href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css", rel="stylesheet", integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh", crossorigin="anonymous")
     title File Uploader
+include navBar.pug
 .container
     if shouldShowHistory
         include history.pug
@@ -20,4 +21,4 @@ head
     #myProgress
         #myBar
             span#barLabel 0%
-script(type='module' src='./client.js')
+script(type='module' src='../fileUploaderClient.js')

@@ -1,6 +1,6 @@
 import { logLine } from "../shared/index.js";
 
-export class WebSocketsWatcher {
+class WebSocketsWatcher {
 	constructor() {
 		this.clients = [];
 	}
@@ -43,3 +43,5 @@ export class WebSocketsWatcher {
 		return result;
 	}
 }
+
+export const webSocketsWatcher = new WebSocketsWatcher();

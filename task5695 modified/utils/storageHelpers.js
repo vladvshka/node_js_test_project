@@ -1,6 +1,6 @@
-const EventEmitter = require("events");
-const path = require("path");
-const fs = require("fs");
+import EventEmitter from "events";
+import path from "path";
+import fs from "fs";
 
 import { logLine } from "../shared/index.js";
 
@@ -45,13 +45,15 @@ class TaskQueue extends EventEmitter {
 	}
 }
 
+export const taskQueue = new TaskQueue();
+
 /**
  * Storage is a single-for-all-users JSON file. That means:
  * 1) We should update it asynchronously, as it's not a util
  * 2) The file is accessed by many users so it's update must be managed in precedence of incoming requests one-by-one
  * 3) As it's JSON, it can't be appended
  */
-const updateStorage = (taskQueue, newFileData) => {
+export const updateStorage = newFileData => {
 	logLine("in updateStorage");
 
 	const task = () =>
@@ -81,9 +83,4 @@ const updateStorage = (taskQueue, newFileData) => {
 		});
 
 	taskQueue.addTask(task);
-};
-
-module.exports = {
-	TaskQueue,
-	updateStorage,
 };

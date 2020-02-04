@@ -15,6 +15,6 @@ require("@babel/register")({
 require("./server");
 require("./router");
 require("./utils/helpers");
-require("./utils//networkHelpers");
+require("./utils/networkHelpers");
 require("./dbService/index");
 require("./dbService/models");
