@@ -28,7 +28,7 @@ const upload = multer({ storage: multerStorage });
 const attachment = upload.single("attachment");
 
 serviceRouter.use((req, res, next) => {
-	logLine(`req.session: ${JSON.stringify(req.session)}`);
+	// logLine(`req.session: ${JSON.stringify(req.session)}`);
 	if (req.session.isAuthorized) {
 		next();
 	} else {
